@@ -15,10 +15,10 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
       </div>
 
       <div className={styles.headerRight}>
-        <button className={styles.notificationButton}>
+        {/* <button className={styles.notificationButton}>
           <BellIcon className={styles.bellIcon} />
           <span className={styles.notificationBadge}></span>
-        </button>
+        </button> */}
 
         <div className={styles.avatarContainer}>
           <button className={styles.avatarButton}>
