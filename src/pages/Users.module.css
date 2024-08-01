@@ -1,0 +1,139 @@
+.usersContainer {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #343a40;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  width: 300px;
+}
+
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat {
+  text-align: center;
+}
+
+.statValue {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.usersTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.usersTable th,
+.usersTable td {
+  padding: 1rem;
+  text-align: left;
+}
+
+.usersTable th {
+  background-color: #f1f3f5;
+  font-weight: bold;
+  color: #495057;
+}
+
+.usersTable tbody tr {
+  transition: background-color 0.3s;
+}
+
+.usersTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.usersTable tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.verificationDropdown {
+  padding: 0.3rem;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+}
+
+@media (max-width: 768px) {
+  .usersContainer {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    margin-bottom: 1rem;
+  }
+
+  .searchBar {
+    width: 100%;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+
+  .statsBar {
+    flex-direction: column;
+  }
+
+  .stat {
+    margin-bottom: 1rem;
+  }
+}

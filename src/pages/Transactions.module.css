@@ -1,0 +1,152 @@
+.transactionsContainer {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #343a40;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.searchInput,
+.dateInput {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.searchInput {
+  width: 300px;
+}
+
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat {
+  text-align: center;
+}
+
+.statValue {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.transactionsTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.transactionsTable th,
+.transactionsTable td {
+  padding: 1rem;
+  text-align: left;
+}
+
+.transactionsTable th {
+  background-color: #f1f3f5;
+  font-weight: bold;
+  color: #495057;
+}
+
+.transactionsTable tbody tr {
+  transition: background-color 0.3s;
+}
+
+.transactionsTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.transactionsTable tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+.credit {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.debit {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.completed {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.pending {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .transactionsContainer {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    margin-bottom: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .searchInput,
+  .dateInput {
+    width: 100%;
+  }
+
+  .statsBar {
+    flex-direction: column;
+  }
+
+  .stat {
+    margin-bottom: 1rem;
+  }
+}
