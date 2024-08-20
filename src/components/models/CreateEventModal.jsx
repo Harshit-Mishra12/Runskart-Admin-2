@@ -6,8 +6,14 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { createevent, fetchmatches } from "../../redux/eventReducer/action";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../common/Spinner";
+import SkeletonListCard from "../common/SkeletonListCard";
 
-const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
+const CreateEventModal = ({
+  edit = false,
+  event,
+  eventFormCreated,
+  eventsLoading,
+}) => {
   const dispatch = useDispatch();
   const { matchesList } = useSelector((store) => store.events);
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +21,7 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [eventData, setEventData] = useState({
     name: "",
     goLiveDate: "",
@@ -33,9 +40,9 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
 
   useEffect(() => {
     const calculateMaxTeamSize = () => {
-      const numberOfTeams = 4; // Assuming there are always 4 teams
+      const numberOfTeams = eventData.matches.length*22; // Assuming there are always 4 teams
       const playersPerTeam = 11; // Number of players per team
-      setMaxTeamSize(numberOfTeams * playersPerTeam);
+      setMaxTeamSize(numberOfTeams);
     };
 
     calculateMaxTeamSize();
@@ -78,10 +85,12 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
         "User Participation Limit cannot be negative";
     if (!eventData.winnersLimit || eventData.winnersLimit <= 0)
       newErrors.winnersLimit = "Winners Limit must be greater than 0";
-    if (parseInt(eventData.winnersLimit) > parseInt(eventData.userParticipationLimit))
-    {
+    if (
+      parseInt(eventData.winnersLimit) >
+      parseInt(eventData.userParticipationLimit)
+    ) {
       newErrors.winnersLimit =
-      "Winners Limit must be less than user Participation Limit value";
+        "Winners Limit must be less than user Participation Limit value";
     }
 
     if (eventData.matches.length === 0) {
@@ -164,6 +173,7 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
   const callbackFunction = (result) => {
     if (result.statusCode == 1) {
       setLoading(false);
+      setFormLoading(false);
       onClose();
       eventFormCreated();
     }
@@ -173,6 +183,7 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
     if (!validate()) return;
     // e.preventDefault();
     setLoading(true);
+    setFormLoading(true);
     console.log("handleSubmit:");
     onCreateEvent(eventData);
     const params = {
@@ -217,7 +228,7 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
 
   return (
     <>
-      {loading && <Spinner />}
+      {formLoading &&  <Spinner />}
       <CustomButton type="primary" onClick={() => setIsOpen(true)}>
         {edit ? "Edit Event" : "Create New Event"}
       </CustomButton>
@@ -272,7 +283,12 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
               <div className={styles.formGroup}>
                 <label htmlFor="matches">Matches</label>
                 <div className={styles.matchesContainer}>
-                  {matchesList &&
+                  {loading ? (
+                    <>
+                      <SkeletonListCard /> <SkeletonListCard /> <SkeletonListCard />
+                    </>
+                  ) : (
+                    matchesList &&
                     matchesList.map((match) => (
                       <div
                         key={match.id}
@@ -292,7 +308,8 @@ const CreateEventModal = ({ edit = false, event, eventFormCreated }) => {
                       >
                         {match.name}
                       </div>
-                    ))}
+                    ))
+                  )}
                 </div>
                 {errors.matches && (
                   <div className={styles.error}>{errors.matches}</div>

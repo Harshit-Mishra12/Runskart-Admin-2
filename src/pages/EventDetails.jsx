@@ -30,13 +30,13 @@ const EventDetails = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("matches");
   const [loading, setLoading] = useState(false);
-
+  const callback = (result) => {
+    if (result.statusCode === 1) {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const callback = (result) => {
-      if (result.statusCode === 1) {
-        setLoading(false);
-      }
-    };
+
     setLoading(true);
     dispatch(fetcheventdetail(id, callback)); // Fetch event detail
   }, [dispatch, id]);
@@ -47,6 +47,7 @@ const EventDetails = () => {
     ? (occupancy / userParticipationLimit) * 100
     : 0;
   const handleEventDelete=()=>{
+    setLoading(true);
     dispatch(eventdelete(id, callback));
 
   }
