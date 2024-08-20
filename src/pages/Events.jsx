@@ -15,7 +15,9 @@ const Events = () => {
   const dispatch = useDispatch();
   const [date, setDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setloading] = useState(false);
+  const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
+  const [clearButtonLoading, setClearButtonLoading] = useState(false);
   const eventsPerPage = 5; // Set the number of events per page
   const { eventsList, totalEvents } = useSelector((store) => store.events); // Assume totalEvents is provided by the backend
 
@@ -23,7 +25,9 @@ const Events = () => {
 
   const callbackAfterFetchSuccess = (result) => {
     if (result.statusCode === 1) {
-      setLoading(false);
+      setloading(false);
+      setSubmitButtonLoading(false);
+      setClearButtonLoading(false)
     }
     console.log("Events fetched successfully");
   };
@@ -34,20 +38,24 @@ const Events = () => {
       page: currentPage,
       date: date || "",
     };
-    setLoading(true);
+    setloading(true);
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
   }, [dispatch, currentPage]);
 
   const handleDateSubmit = () => {
+    setloading(true);
+    setSubmitButtonLoading(true);
     setCurrentPage(1); // Reset to page 1 when filtering by date
     const params = {
       per_page: eventsPerPage,
       page: 1,
       date: date || "",
     };
+
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
   };
   const eventFormCreated = () => {
+
     setCurrentPage(1); // Reset to the first page
     fetchEvents();
   };
@@ -63,6 +71,7 @@ const Events = () => {
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
   };
   const handleClearDate = () => {
+    setClearButtonLoading(true);
     setDate(""); // Clear the date filter
     setCurrentPage(1); // Reset to page 1
     const params = {
@@ -106,11 +115,11 @@ const Events = () => {
           placeholder="Select Date"
           className={styles.dateInput}
         />
-        <CustomButton type="primary" onClick={handleDateSubmit} height="40px">
+        <CustomButton type="primary"  isLoading={submitButtonLoading} onClick={handleDateSubmit} height="40px">
           Submit
         </CustomButton>
         <div className={styles.space}></div>
-        <CustomButton type="primary" onClick={handleClearDate} height="40px">
+        <CustomButton type="secondary" isLoading={clearButtonLoading} onClick={handleClearDate} height="40px">
           Clear
         </CustomButton>
       </div>

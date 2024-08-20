@@ -5,13 +5,23 @@ import { tempMatches } from "../../utils/tempData";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { createevent, fetchmatches } from "../../redux/eventReducer/action";
 import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../common/Spinner";
+import SkeletonListCard from "../common/SkeletonListCard";
 
-const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
+const CreateEventModal = ({
+  edit = false,
+  event,
+  eventFormCreated,
+  eventsLoading,
+}) => {
   const dispatch = useDispatch();
   const { matchesList } = useSelector((store) => store.events);
   const [isOpen, setIsOpen] = useState(false);
   const [matchesData, setMatchesData] = useState([]);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [eventData, setEventData] = useState({
     name: "",
     goLiveDate: "",
@@ -26,12 +36,92 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
     prizes: [{ rank: 1, prize_amount: "" }],
     otherPrizes: "",
   });
-  console.log("matches list:", matchesList);
+  const [maxTeamSize, setMaxTeamSize] = useState(0);
+
   useEffect(() => {
+    const calculateMaxTeamSize = () => {
+      const numberOfTeams = eventData.matches.length*22; // Assuming there are always 4 teams
+      const playersPerTeam = 11; // Number of players per team
+      setMaxTeamSize(numberOfTeams);
+    };
+
+    calculateMaxTeamSize();
+  }, [eventData.matches]);
+
+  const validate = () => {
+    const newErrors = {};
+    if (!eventData.name) newErrors.name = "Event Name is required";
+    // if (!eventData.goLiveDate)
+    //   newErrors.goLiveDate = "Go Live Date is required";
+    if (eventData.teamSizeLimit < 11) {
+      newErrors.teamSizeLimit = "Team size limit cannot be less than 11";
+    } else if (eventData.teamSizeLimit > maxTeamSize) {
+      newErrors.teamSizeLimit = `Team size limit cannot be greater than ${maxTeamSize}`;
+    }
+
+    if (!eventData.batsmanLimit || eventData.batsmanLimit <= 0)
+      newErrors.batsmanLimit = "Batsman Limit must be greater than 0";
+    if (!eventData.bowlerLimit || eventData.bowlerLimit <= 0)
+      newErrors.bowlerLimit = "Bowler Limit must be greater than 0";
+    if (!eventData.allRounderLimit || eventData.allRounderLimit <= 0)
+      newErrors.allRounderLimit = "All-Rounder Limit must be greater than 0";
+    const totalPlayerLimit =
+      parseInt(eventData.batsmanLimit, 10) +
+      parseInt(eventData.bowlerLimit, 10) +
+      parseInt(eventData.allRounderLimit, 10);
+    if (totalPlayerLimit > eventData.teamSizeLimit) {
+      newErrors.playerLimits =
+        "The sum of Batsman Limit, Bowler Limit, and All-Rounder Limit cannot be greater than Team Size Limit";
+    }
+    if (!eventData.teamCreationCost || eventData.teamCreationCost < 0)
+      newErrors.teamCreationCost = "Team Creation Cost cannot be negative";
+    if (!eventData.otherPrizes || eventData.otherPrizes <= 0)
+      newErrors.otherPrizes = "other Prizes Value must be greater than 0";
+    if (
+      !eventData.userParticipationLimit ||
+      eventData.userParticipationLimit < 0
+    )
+      newErrors.userParticipationLimit =
+        "User Participation Limit cannot be negative";
+    if (!eventData.winnersLimit || eventData.winnersLimit <= 0)
+      newErrors.winnersLimit = "Winners Limit must be greater than 0";
+    if (
+      parseInt(eventData.winnersLimit) >
+      parseInt(eventData.userParticipationLimit)
+    ) {
+      newErrors.winnersLimit =
+        "Winners Limit must be less than user Participation Limit value";
+    }
+
+    if (eventData.matches.length === 0) {
+      newErrors.matches = "Select at least one match";
+    }
+    eventData.prizes.forEach((prize, index) => {
+      if (prize.prize_amount <= 0) {
+        newErrors[`prize_amount_${index}`] =
+          "Minimum prize amount should be greater than 0";
+      }
+    });
+
+    // eventData.prizes.forEach((prize, index) => {
+    //   if (!prize.prize_amount || prize.prize_amount <= 0) newErrors[`prize_amount_${index}`] = `Prize Amount for rank ${prize.rank} must be greater than 0`;
+    // });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  useEffect(() => {
+    const callbackFunction = (result) => {
+      if (result.statusCode == 1) {
+        setLoading(false);
+      }
+    };
     const params = {
       date: date,
     };
-    dispatch(fetchmatches(params));
+    setLoading(true);
+    setEventData((prevData) => ({ ...prevData, matches: [] }));
+    dispatch(fetchmatches(params, callbackFunction));
   }, [date]);
 
   useEffect(() => {
@@ -80,16 +170,21 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
     }));
   };
 
-  const callbackFunction=(result)=>{
-    if(result.statusCode == 1)
-    {
+  const callbackFunction = (result) => {
+    if (result.statusCode == 1) {
+      setLoading(false);
+      setFormLoading(false);
       onClose();
       eventFormCreated();
     }
-
-  }
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  };
+  const handleSubmit = () => {
+    console.log("matches list:", eventData.matches);
+    if (!validate()) return;
+    // e.preventDefault();
+    setLoading(true);
+    setFormLoading(true);
+    console.log("handleSubmit:");
     onCreateEvent(eventData);
     const params = {
       name: eventData.name,
@@ -100,15 +195,14 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
       all_rounder_limit: eventData.allRounderLimit,
       team_creation_cost: eventData.teamCreationCost,
       user_participation_limit: eventData.userParticipationLimit,
-      winners_limit:eventData.winnersLimit,
-      prizes:eventData.prizes,
-      other_prizes:eventData.otherPrizes,
-      matches:eventData.matches
+      winners_limit: eventData.winnersLimit,
+      prizes: eventData.prizes,
+      other_prizes: eventData.otherPrizes,
+      matches: eventData.matches,
     };
-    console.log("handleSubmit:",params);
+    console.log("handleSubmit:", params);
     // return;
-    dispatch(createevent(params,callbackFunction));
-
+    dispatch(createevent(params, callbackFunction));
   };
 
   const onCreateEvent = (eventData) => {
@@ -134,6 +228,7 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
 
   return (
     <>
+      {formLoading &&  <Spinner />}
       <CustomButton type="primary" onClick={() => setIsOpen(true)}>
         {edit ? "Edit Event" : "Create New Event"}
       </CustomButton>
@@ -158,7 +253,7 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
               <XMarkIcon className={styles.closeIcon} />
             </button>
 
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.form}>
               <div className={styles.formGroup}>
                 <label htmlFor="name">Event Name</label>
                 <input
@@ -169,7 +264,9 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                   onChange={handleChange}
                   required
                 />
-
+                {errors.name && (
+                  <span className={styles.error}>{errors.name}</span>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="goLiveDate">Go Live Date</label>
@@ -186,7 +283,12 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
               <div className={styles.formGroup}>
                 <label htmlFor="matches">Matches</label>
                 <div className={styles.matchesContainer}>
-                  {matchesList &&
+                  {loading ? (
+                    <>
+                      <SkeletonListCard /> <SkeletonListCard /> <SkeletonListCard />
+                    </>
+                  ) : (
+                    matchesList &&
                     matchesList.map((match) => (
                       <div
                         key={match.id}
@@ -206,8 +308,12 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                       >
                         {match.name}
                       </div>
-                    ))}
+                    ))
+                  )}
                 </div>
+                {errors.matches && (
+                  <div className={styles.error}>{errors.matches}</div>
+                )}
               </div>
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
@@ -220,6 +326,9 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                     onChange={handleChange}
                     required
                   />
+                  {errors.teamSizeLimit && (
+                    <span className={styles.error}>{errors.teamSizeLimit}</span>
+                  )}
                 </div>
                 <div className={styles.formGroup}>
                   <label htmlFor="batsmanLimit">Batsman Limit</label>
@@ -231,6 +340,9 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                     onChange={handleChange}
                     required
                   />
+                  {errors.batsmanLimit && (
+                    <span className={styles.error}>{errors.batsmanLimit}</span>
+                  )}
                 </div>
               </div>
               <div className={styles.formRow}>
@@ -244,6 +356,9 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                     onChange={handleChange}
                     required
                   />
+                  {errors.bowlerLimit && (
+                    <span className={styles.error}>{errors.bowlerLimit}</span>
+                  )}
                 </div>
                 <div className={styles.formGroup}>
                   <label htmlFor="allRounderLimit">All-Rounder Limit</label>
@@ -255,8 +370,16 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                     onChange={handleChange}
                     required
                   />
+                  {errors.allRounderLimit && (
+                    <span className={styles.error}>
+                      {errors.allRounderLimit}
+                    </span>
+                  )}
                 </div>
               </div>
+              {errors.playerLimits && (
+                <div className={styles.error}>{errors.playerLimits}</div>
+              )}
               <div className={styles.formGroup}>
                 <label htmlFor="teamCreationCost">Team Creation Cost</label>
                 <input
@@ -267,6 +390,11 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                   onChange={handleChange}
                   required
                 />
+                {errors.teamCreationCost && (
+                  <span className={styles.error}>
+                    {errors.teamCreationCost}
+                  </span>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="userParticipationLimit">
@@ -280,6 +408,11 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                   onChange={handleChange}
                   required
                 />
+                {errors.userParticipationLimit && (
+                  <span className={styles.error}>
+                    {errors.userParticipationLimit}
+                  </span>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="winnersLimit">Winners Limit</label>
@@ -291,6 +424,9 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                   onChange={handleChange}
                   required
                 />
+                {errors.winnersLimit && (
+                  <span className={styles.error}>{errors.winnersLimit}</span>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label>Prizes</label>
@@ -314,6 +450,11 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                       placeholder="Amount"
                       className={styles.prizeAmount}
                     />
+                    {errors[`prize_amount_${index}`] && (
+                      <div className={styles.error}>
+                        {errors[`prize_amount_${index}`]}
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div>
@@ -343,16 +484,19 @@ const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
                   value={eventData.otherPrizes}
                   onChange={handleChange}
                 />
+                {errors.otherPrizes && (
+                  <span className={styles.error}>{errors.otherPrizes}</span>
+                )}
               </div>
               <div className={styles.buttonGroup}>
                 <CustomButton type="secondary" onClick={onClose}>
                   Cancel
                 </CustomButton>
-                <CustomButton type="primary" submit>
+                <CustomButton type="primary" onClick={handleSubmit}>
                   {edit ? "Save Changes" : "Create Event"}
                 </CustomButton>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

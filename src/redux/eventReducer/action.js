@@ -36,7 +36,7 @@ export const fetchevents = (params,callback) => async (dispatch) => {
   }
 };
 
-export const fetchmatches = (params) => async (dispatch) => {
+export const fetchmatches = (params,callback) => async (dispatch) => {
     console.log("check response fetchmatches api :",params);
     const token = JSON.parse(localStorage.getItem('token'));
     const config = {
@@ -51,7 +51,7 @@ export const fetchmatches = (params) => async (dispatch) => {
 
       dispatch({ type: types.GET_MATCHES_SUCCESS ,payload:response.data.data});
 
-    //   callback( { statusCode: 1, message: "success" });
+      callback( { statusCode: 1, message: "success" });
     }
     else{
     //   callback( { statusCode: 2, message: "fail" });
@@ -103,6 +103,34 @@ export const fetcheventdetail = (id,callback) => async (dispatch) => {
       };
   try {
     const response = await axios.get(`${API_URL}/admin/events/fetch/${id}`, config);
+    console.log("response createevent api ", response.data.data);
+    if (response.data.status_code === 1 ) {
+
+      dispatch({ type: types.GET_EVENTDETAIL_SUCCESS ,payload:response.data.data});
+
+      callback( { statusCode: 1, message: "success" });
+    }
+    else{
+      callback( { statusCode: 2, message: "fail" });
+    }
+    return { statusCode: 1, message: "success"};
+
+  } catch (error) {
+    console.error("dashboard error:", error);
+    return { statusCode: 2, message: error.message };
+  }
+};
+
+export const eventdelete = (id,callback) => async (dispatch) => {
+    console.log("check response createevent api :",id);
+    const token = JSON.parse(localStorage.getItem('token'));
+    const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  try {
+    const response = await axios.get(`${API_URL}/admin/events/delete/${id}`, config);
     console.log("response createevent api ", response.data.data);
     if (response.data.status_code === 1 ) {
 
