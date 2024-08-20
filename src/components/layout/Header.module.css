@@ -69,6 +69,33 @@
   height: 100%;
   object-fit: cover;
 }
+.dropdownMenu {
+  position: absolute;
+  top: 3rem; /* Adjust as needed */
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.dropdownMenu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdownMenu li {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdownMenu li:hover {
+  background-color: #f3f4f6;
+}
+
 
 @media (max-width: 1024px) {
   .menuButton {

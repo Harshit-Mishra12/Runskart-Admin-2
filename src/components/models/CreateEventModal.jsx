@@ -3,9 +3,15 @@ import styles from "./CreateEventModal.module.css";
 import CustomButton from "../common/CustomButton";
 import { tempMatches } from "../../utils/tempData";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { createevent, fetchmatches } from "../../redux/eventReducer/action";
+import { useDispatch, useSelector } from "react-redux";
 
-const CreateEventModal = ({ edit = false, event }) => {
+const CreateEventModal = ({ edit = false, event,eventFormCreated }) => {
+  const dispatch = useDispatch();
+  const { matchesList } = useSelector((store) => store.events);
   const [isOpen, setIsOpen] = useState(false);
+  const [matchesData, setMatchesData] = useState([]);
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [eventData, setEventData] = useState({
     name: "",
     goLiveDate: "",
@@ -17,9 +23,16 @@ const CreateEventModal = ({ edit = false, event }) => {
     teamCreationCost: "",
     userParticipationLimit: "",
     winnersLimit: "",
-    prizes: [{ rank: 1, amount: "" }],
+    prizes: [{ rank: 1, prize_amount: "" }],
     otherPrizes: "",
   });
+  console.log("matches list:", matchesList);
+  useEffect(() => {
+    const params = {
+      date: date,
+    };
+    dispatch(fetchmatches(params));
+  }, [date]);
 
   useEffect(() => {
     if (edit && event) {
@@ -29,6 +42,11 @@ const CreateEventModal = ({ edit = false, event }) => {
       });
     }
   }, [edit, event, isOpen]);
+  const handleGoLiveDateChange = (e) => {
+    const newDate = e.target.value;
+    setEventData((prevData) => ({ ...prevData, goLiveDate: newDate }));
+    setDate(newDate); // Update date state whenever goLiveDate changes
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +68,7 @@ const CreateEventModal = ({ edit = false, event }) => {
       ...prevData,
       prizes: [
         ...prevData.prizes,
-        { rank: prevData.prizes.length + 1, amount: "" },
+        { rank: prevData.prizes.length + 1, prize_amount: "" },
       ],
     }));
   };
@@ -62,10 +80,35 @@ const CreateEventModal = ({ edit = false, event }) => {
     }));
   };
 
+  const callbackFunction=(result)=>{
+    if(result.statusCode == 1)
+    {
+      onClose();
+      eventFormCreated();
+    }
+
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     onCreateEvent(eventData);
-    onClose();
+    const params = {
+      name: eventData.name,
+      go_live_date: date,
+      team_size: eventData.teamSizeLimit,
+      batsman_limit: eventData.batsmanLimit,
+      bowler_limit: eventData.bowlerLimit,
+      all_rounder_limit: eventData.allRounderLimit,
+      team_creation_cost: eventData.teamCreationCost,
+      user_participation_limit: eventData.userParticipationLimit,
+      winners_limit:eventData.winnersLimit,
+      prizes:eventData.prizes,
+      other_prizes:eventData.otherPrizes,
+      matches:eventData.matches
+    };
+    console.log("handleSubmit:",params);
+    // return;
+    dispatch(createevent(params,callbackFunction));
+
   };
 
   const onCreateEvent = (eventData) => {
@@ -85,7 +128,7 @@ const CreateEventModal = ({ edit = false, event }) => {
       teamCreationCost: "",
       userParticipationLimit: "",
       winnersLimit: "",
-      prizes: [{ rank: 1, amount: "" }],
+      prizes: [{ rank: 1, prize_amount: "" }],
     });
   };
 
@@ -126,6 +169,7 @@ const CreateEventModal = ({ edit = false, event }) => {
                   onChange={handleChange}
                   required
                 />
+
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="goLiveDate">Go Live Date</label>
@@ -133,8 +177,8 @@ const CreateEventModal = ({ edit = false, event }) => {
                   type="date"
                   id="goLiveDate"
                   name="goLiveDate"
-                  value={eventData.goLiveDate}
-                  onChange={handleChange}
+                  value={date}
+                  onChange={handleGoLiveDateChange}
                   min={new Date().toISOString().split("T")[0]}
                   required
                 />
@@ -142,26 +186,27 @@ const CreateEventModal = ({ edit = false, event }) => {
               <div className={styles.formGroup}>
                 <label htmlFor="matches">Matches</label>
                 <div className={styles.matchesContainer}>
-                  {tempMatches.map((match) => (
-                    <div
-                      key={match.id}
-                      className={`${styles.matchItem} ${
-                        eventData.matches.some((m) => m.id === match.id)
-                          ? styles.selected
-                          : ""
-                      }`}
-                      onClick={() => {
-                        const updatedMatches = eventData.matches.some(
-                          (m) => m.id === match.id
-                        )
-                          ? eventData.matches.filter((m) => m.id !== match.id)
-                          : [...eventData.matches, match];
-                        handleMatchesChange(updatedMatches);
-                      }}
-                    >
-                      {match.team1} vs {match.team2}
-                    </div>
-                  ))}
+                  {matchesList &&
+                    matchesList.map((match) => (
+                      <div
+                        key={match.id}
+                        className={`${styles.matchItem} ${
+                          eventData.matches.some((m) => m.id === match.id)
+                            ? styles.selected
+                            : ""
+                        }`}
+                        onClick={() => {
+                          const updatedMatches = eventData.matches.some(
+                            (m) => m.id === match.id
+                          )
+                            ? eventData.matches.filter((m) => m.id !== match.id)
+                            : [...eventData.matches, match];
+                          handleMatchesChange(updatedMatches);
+                        }}
+                      >
+                        {match.name}
+                      </div>
+                    ))}
                 </div>
               </div>
               <div className={styles.formRow}>
@@ -262,9 +307,9 @@ const CreateEventModal = ({ edit = false, event }) => {
                     />
                     <input
                       type="number"
-                      value={prize.amount}
+                      value={prize.prize_amount}
                       onChange={(e) =>
-                        handlePrizeChange(index, "amount", e.target.value)
+                        handlePrizeChange(index, "prize_amount", e.target.value)
                       }
                       placeholder="Amount"
                       className={styles.prizeAmount}

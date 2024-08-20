@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CustomButton from "../components/common/CustomButton";
 import styles from "./EventDetails.module.css";
 import { ProgressBar } from "react-bootstrap";
-import { eventsdata } from "../utils/eventsdata";
 import {
   FaCalendarAlt,
   FaUsers,
@@ -19,16 +18,34 @@ import CreateEventModal from "../components/models/CreateEventModal";
 import MatchesComponent from "../components/eventDetails/MatchesComponent";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { generateRandomTeams } from "../utils/tempData";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetcheventdetail } from "../redux/eventReducer/action";
 
 const EventDetails = () => {
+  const dispatch = useDispatch();
+  const { eventDetail } = useSelector((store) => store.events);
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("matches");
-  const event = eventsdata.find((e) => e.id === parseInt(id));
 
-  if (!event) {
+  useEffect(() => {
+    dispatch(fetcheventdetail(id));  // Fetch event detail
+  }, [dispatch, id]);
+
+  if (!eventDetail) {
     return <div className={styles.notFound}>Event not found</div>;
   }
+
+  const { event, prizes, matches, occupancy} = eventDetail;
+
+  // Fallback default values
+  const userParticipationLimit = event?.user_participation_limit ?? 0;
+  // Calculate occupancy percentage
+  const occupancyPercentage = userParticipationLimit
+    ? (occupancy / userParticipationLimit) * 100
+    : 0;
+
+  console.log("eventDetail :", event);
 
   const getColor = (total, filled) => {
     if (filled / total >= 0.9) return "success";
@@ -87,65 +104,49 @@ const EventDetails = () => {
     {
       icon: <FaCalendarAlt className={styles.icon} />,
       label: "Go Live Date",
-      value: event.goLiveDate,
+      value: event.go_live_date,
     },
     {
       icon: <FaMoneyBillWave className={styles.icon} />,
       label: "Team Creation Cost",
-      value: `₹${event.teamCreationCost.toLocaleString()}`,
+      value: `₹${event.team_creation_cost.toLocaleString()}`,
     },
     {
       icon: <FaUsers className={styles.icon} />,
       label: "Team Size Limit",
-      value: event.teamSizeLimit,
+      value: event.team_size,
     },
     {
       icon: <FaUsers className={styles.icon} />,
       label: "Participation Limit",
-      value: event.userParticipationLimit.toLocaleString(),
+      value: userParticipationLimit.toLocaleString(),
     },
     {
       icon: <TbCricket className={styles.icon} />,
       label: "Matches",
-      value: event.matches.length.toLocaleString(),
+      value: event.matches_count.toLocaleString(),
     },
     {
       icon: <GiCricketBat className={styles.icon} />,
       label: "Batsman Limit",
-      value: event.batsmanLimit.toLocaleString(),
+      value: event.batsman_limit.toLocaleString(),
     },
     {
       icon: <BiCricketBall className={styles.icon} />,
       label: "Bowler Limit",
-      value: event.bowlerLimit.toLocaleString(),
+      value: event.bowler_limit.toLocaleString(),
     },
     {
       icon: <MdSportsCricket className={styles.icon} />,
       label: "All Rounder Limit",
-      value: event.allRounderLimit.toLocaleString(),
+      value: event.all_rounder_limit.toLocaleString(),
     },
   ];
 
-  // const prizeDetails = [
-  //   { label: "1st Prize", value: `₹${event.firstPrize.toLocaleString()}` },
-  //   { label: "2nd Prize", value: `₹${event.secondPrize.toLocaleString()}` },
-  //   { label: "3rd Prize", value: `₹${event.thirdPrize.toLocaleString()}` },
-  //   { label: "4th Prize", value: `₹${event.fourthPrize.toLocaleString()}` },
-  //   { label: "5th Prize", value: `₹${event.fifthPrize.toLocaleString()}` },
-  //   { label: "Other Prizes", value: `₹${event.otherPrizes.toLocaleString()}` },
-  // ];
-
-  const prizeDetails = event.prizes.map((prize, index) => ({
-    label: `Rank ${index + 1}`,
-    value: `₹${prize.amount.toLocaleString()}`,
+  const prizeDetails = prizes.map((prize, index) => ({
+    label: `Rank ${prize.rank_from}${prize.rank_to > prize.rank_from ? `-${prize.rank_to}` : ""}`,
+    value: `₹${prize.prize_amount.toLocaleString()}`,
   }));
-
-  if (parseInt(event.otherPrizes) > 0) {
-    prizeDetails.push({
-      label: "Other Prizes",
-      value: `₹${event.otherPrizes.toLocaleString()}`,
-    });
-  }
 
   return (
     <div className={styles.eventDetailsContainer}>
@@ -190,9 +191,9 @@ const EventDetails = () => {
       <div className={styles.occupancy}>
         <h2>Event Occupancy</h2>
         <ProgressBar
-          now={(event.teamsAllocated / event.userParticipationLimit) * 100}
-          label={`${event.teamsAllocated}/${event.userParticipationLimit}`}
-          variant={getColor(event.userParticipationLimit, event.teamsAllocated)}
+          now={occupancyPercentage}
+          label={`${occupancy}/${userParticipationLimit}`}
+          variant={getColor(userParticipationLimit, occupancy)}
           animated
           className={styles.progressBar}
         />
@@ -212,7 +213,7 @@ const EventDetails = () => {
       </div>
 
       <div className={styles.actions}>
-        {event.status !== "Cancelled" &&
+        {/* {event.status !== "Cancelled" &&
           event.status !== "Live" &&
           event.status !== "Completed" && (
             <CustomButton
@@ -230,8 +231,8 @@ const EventDetails = () => {
             >
               {getButtonText(event.status)}
             </CustomButton>
-          )}
-        {event.status === "Created" && (
+          )} */}
+        {event.status === "CREATED" && (
           <CustomButton type="danger" alert={true}>
             Delete Event
           </CustomButton>
@@ -261,7 +262,7 @@ const EventDetails = () => {
         </div>
         <div className={styles.tabContent}>
           {activeTab === "matches" && (
-            <MatchesComponent matches={event.matches} />
+            <MatchesComponent matches={matches} />
           )}
           {activeTab === "teams" && (
             <UserTeamComponent teams={generateRandomTeams(50, event.status)} />

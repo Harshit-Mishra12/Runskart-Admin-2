@@ -17,8 +17,8 @@ const CustomButton = ({
   const [showAlert, setShowAlert] = useState(false);
 
   const buttonClass = `
-    ${styles.button} 
-    ${styles[type]} 
+    ${styles.button}
+    ${styles[type]}
     ${fullWidth ? styles.fullWidth : ""}
     ${disabled || isLoading ? styles.disabled : ""}
     ${className}

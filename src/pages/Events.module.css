@@ -121,3 +121,14 @@
     margin-bottom: 1rem;
   }
 }
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+.space{
+  margin-left: 10px;
+}
+

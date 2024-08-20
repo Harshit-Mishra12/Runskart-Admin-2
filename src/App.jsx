@@ -23,6 +23,7 @@ function App() {
           <Route path="users/:id" element={<UserDetails />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="faq" element={<FAQ />} />
+
         </Route>
         <Route path="login" element={<Login />} />
       </Routes>
