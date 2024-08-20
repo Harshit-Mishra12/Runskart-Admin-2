@@ -4,6 +4,7 @@ import styles from "./Login.module.css";
 import CustomButton from "../components/common/CustomButton";
 import { useNavigate } from "react-router-dom";
 import { login } from '../redux/authReducer/action';
+import Snackbar from "../components/common/Snackbar";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +12,10 @@ const Login = () => {
   const [email, setEmail] = useState("Qwerty@gamil.com");
   const [password, setPassword] = useState("Qwerty123");
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({}); // To store validation errors
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [snackbarSeverity, setSnackbarSeverity] = useState(null);
 
   const validateForm = () => {
     const newErrors = {};
@@ -27,34 +31,42 @@ const Login = () => {
     }
     return newErrors;
   };
-  const callbackAfterLoginSuccess = (result) => {
 
-    if(result.statusCode === 2)
-      {
-        // setSnackbarMessage('Invalid Credentials!');
-        // setSnackbarSeverity('error');
-        // setOpenSnackbar(true);
-        // setLoading(false);
-      }
-      else{
-        setLoading(false);
-        navigate('/');
-      }
+  const callbackAfterLoginSuccess = (result) => {
+    if (result.statusCode === 2) {
+      setSnackbarMessage("Invalid Credentials!");
+      setSnackbarSeverity("error");
+      setIsLoading(false);
+    } else {
+      setSnackbarMessage("Login Successful!");
+      setSnackbarSeverity("success");
+      setLoading(false);
+      setIsLoading(false);
+      navigate('/');
+    }
   };
+
   const handleSubmit = (e) => {
+    setIsLoading(true);
     e.preventDefault();
     const newErrors = validateForm();
     if (Object.keys(newErrors).length === 0) {
-      // No validation errors, proceed with dispatch
       const formData = { email, password };
       dispatch(login(formData, callbackAfterLoginSuccess));
     } else {
-      setErrors(newErrors); // Set validation errors
+      setErrors(newErrors);
     }
   };
 
   return (
     <div className={styles.loginContainer}>
+      {snackbarMessage && (
+        <Snackbar
+          message={snackbarMessage}
+          severity={snackbarSeverity}
+          onClose={() => setSnackbarMessage(null)}
+        />
+      )}
       <div className={styles.loginCard}>
         <img
           src="https://picsum.photos/500"
@@ -83,7 +95,7 @@ const Login = () => {
             />
             {errors.password && <p className={styles.errorText}>{errors.password}</p>}
           </div>
-          <CustomButton type="primary" width="200px">
+          <CustomButton  isLoading={isLoading} type="primary" width="200px">
             Login
           </CustomButton >
         </form>

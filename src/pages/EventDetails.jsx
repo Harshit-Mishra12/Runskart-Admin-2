@@ -18,8 +18,10 @@ import CreateEventModal from "../components/models/CreateEventModal";
 import MatchesComponent from "../components/eventDetails/MatchesComponent";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { generateRandomTeams } from "../utils/tempData";
-import { useDispatch, useSelector } from 'react-redux';
-import { fetcheventdetail } from "../redux/eventReducer/action";
+import { useDispatch, useSelector } from "react-redux";
+import { eventdelete, fetcheventdetail } from "../redux/eventReducer/action";
+import Skeleton from "../components/common/Skeleton";
+import ResultsComponent from '../components/eventDetails/ResultsComponent'
 
 const EventDetails = () => {
   const dispatch = useDispatch();
@@ -27,26 +29,27 @@ const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("matches");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    dispatch(fetcheventdetail(id));  // Fetch event detail
+    const callback = (result) => {
+      if (result.statusCode === 1) {
+        setLoading(false);
+      }
+    };
+    setLoading(true);
+    dispatch(fetcheventdetail(id, callback)); // Fetch event detail
   }, [dispatch, id]);
 
-  if (!eventDetail) {
-    return <div className={styles.notFound}>Event not found</div>;
-  }
-
-  const { event, prizes, matches, occupancy} = eventDetail;
-
-  // Fallback default values
+  const { event, prizes, matches, occupancy } = eventDetail || {};
   const userParticipationLimit = event?.user_participation_limit ?? 0;
-  // Calculate occupancy percentage
   const occupancyPercentage = userParticipationLimit
     ? (occupancy / userParticipationLimit) * 100
     : 0;
+  const handleEventDelete=()=>{
+    dispatch(eventdelete(id, callback));
 
-  console.log("eventDetail :", event);
-
+  }
   const getColor = (total, filled) => {
     if (filled / total >= 0.9) return "success";
     if (filled / total >= 0.7) return "info";
@@ -54,67 +57,49 @@ const EventDetails = () => {
     return "danger";
   };
 
-  const handleCancel = () => console.log("Cancel event");
-  const handleStart = () => console.log("Start event");
-  const handleResult = () => console.log("Show results");
-
-  const getButtonText = (status) => {
-    switch (status) {
-      case "Created":
-        return "Release Event";
-      case "Released":
-        return "Cancel Event";
-      case "Live":
-        return "Show Results";
-      case "Completed":
-        return "Show Results";
-      case "Cancelled":
-        return "Go Back";
-      default:
-        return "Unknown Action";
-    }
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
-      case "Created":
-        return colors.primary;
-      case "Released":
-        return colors.secondary;
-      case "Live":
-        return colors.success;
-      case "Cancelled":
-        return colors.danger;
+      case "CREATED":
+        return colors.primary;   // E.g., blue for CREATED
+      case "RELEASED":
+        return colors.secondary; // E.g., green for RELEASED
+      case "LIVE":
+        return colors.success;   // E.g., dark green for LIVE
+      case "COMPLETED":
+        return colors.info;      // E.g., light blue for COMPLETED
+      case "CANCELLED":
+        return colors.danger;    // E.g., red for CANCELLED
       default:
-        return colors.info;
+        return colors.default;   // E.g., gray for unknown status
     }
   };
+
 
   const eventDetails = [
     {
       label: "Event Status",
-      value: event.status,
+      value: event?.status,
       icon: (
         <FaTrophy
           className={styles.icon}
-          style={{ color: getStatusColor(event.status) }}
+          style={{ color: getStatusColor(event?.status) }}
         />
       ),
     },
     {
       icon: <FaCalendarAlt className={styles.icon} />,
       label: "Go Live Date",
-      value: event.go_live_date,
+      value: event?.go_live_date,
     },
     {
       icon: <FaMoneyBillWave className={styles.icon} />,
       label: "Team Creation Cost",
-      value: `₹${event.team_creation_cost.toLocaleString()}`,
+      value: `₹${event?.team_creation_cost?.toLocaleString()}`,
     },
     {
       icon: <FaUsers className={styles.icon} />,
       label: "Team Size Limit",
-      value: event.team_size,
+      value: event?.team_size,
     },
     {
       icon: <FaUsers className={styles.icon} />,
@@ -124,151 +109,179 @@ const EventDetails = () => {
     {
       icon: <TbCricket className={styles.icon} />,
       label: "Matches",
-      value: event.matches_count.toLocaleString(),
+      value: event?.matches_count?.toLocaleString(),
     },
     {
       icon: <GiCricketBat className={styles.icon} />,
       label: "Batsman Limit",
-      value: event.batsman_limit.toLocaleString(),
+      value: event?.batsman_limit?.toLocaleString(),
     },
     {
       icon: <BiCricketBall className={styles.icon} />,
       label: "Bowler Limit",
-      value: event.bowler_limit.toLocaleString(),
+      value: event?.bowler_limit?.toLocaleString(),
     },
     {
       icon: <MdSportsCricket className={styles.icon} />,
       label: "All Rounder Limit",
-      value: event.all_rounder_limit.toLocaleString(),
+      value: event?.all_rounder_limit?.toLocaleString(),
     },
   ];
 
-  const prizeDetails = prizes.map((prize, index) => ({
-    label: `Rank ${prize.rank_from}${prize.rank_to > prize.rank_from ? `-${prize.rank_to}` : ""}`,
+  const prizeDetails = prizes?.map((prize, index) => ({
+    label: `Rank ${prize.rank_from}${
+      prize.rank_to > prize.rank_from ? `-${prize.rank_to}` : ""
+    }`,
     value: `₹${prize.prize_amount.toLocaleString()}`,
   }));
-
+  const adjustedOccupancyPercentage = Math.max(occupancyPercentage, 1);
   return (
     <div className={styles.eventDetailsContainer}>
       <div className={styles.header}>
-        <h1>{event.name}</h1>
-        <div
-          style={{
-            display: "flex",
-            gap: "1rem",
-          }}
-        >
+        <h1>{event?.name}</h1>
+        <div style={{ display: "flex", gap: "1rem" }}>
           <CustomButton type="outline" onClick={() => navigate("/events")}>
             Back to Events
           </CustomButton>
-          {event.status === "Created" && (
+          {event?.status === "Created" && (
             <CreateEventModal edit={true} event={event} />
           )}
         </div>
       </div>
 
       <div className={styles.eventInfo}>
-        {eventDetails.map((detail, index) => (
-          <div key={index} className={styles.infoCard}>
-            {detail.icon}
-            <span className={styles.label}>{detail.label}</span>
-            <span
-              className={styles.value}
-              style={{
-                color:
-                  detail.label === "Event Status"
-                    ? getStatusColor(event.status)
-                    : "black",
-                fontWeight: detail.label === "Event Status" ? "bold" : "normal",
-              }}
-            >
-              {detail.value}
-            </span>
+        {loading
+          ? Array(8)
+              .fill(0)
+              .map((_, index) => <Skeleton key={index} height="100px" />)
+          : eventDetails.map(
+              (detail, index) =>
+                detail.value && (
+                  <div key={index} className={styles.infoCard}>
+                    {detail.icon}
+                    <span className={styles.label}>{detail.label}</span>
+                    <span
+                      className={styles.value}
+                      style={{
+                        color:
+                          detail.label === "Event Status"
+                            ? getStatusColor(event.status)
+                            : "black",
+                        fontWeight:
+                          detail.label === "Event Status" ? "bold" : "normal",
+                      }}
+                    >
+                      {detail.value}
+                    </span>
+                  </div>
+                )
+            )}
+      </div>
+
+      {event && (
+        <>
+          <div className={styles.occupancy}>
+            <h2>Event Occupancy</h2>
+            {loading ? (
+              <Skeleton height={30} width="100%" />
+            ) : (
+              <ProgressBar
+                now={occupancyPercentage}
+                label={`${occupancy}/${userParticipationLimit}`}
+                variant={getColor(userParticipationLimit, occupancy)}
+                animated
+                className={styles.progressBar}
+                style={{ textAlign: "center" }} // Ensure label is centered
+              />
+            )}
           </div>
-        ))}
-      </div>
 
-      <div className={styles.occupancy}>
-        <h2>Event Occupancy</h2>
-        <ProgressBar
-          now={occupancyPercentage}
-          label={`${occupancy}/${userParticipationLimit}`}
-          variant={getColor(userParticipationLimit, occupancy)}
-          animated
-          className={styles.progressBar}
-        />
-      </div>
-
-      <div className={styles.prizes}>
-        <h2>Prize Distribution</h2>
-        <div className={styles.prizeGrid}>
-          {prizeDetails.map((prize, index) => (
-            <div key={index} className={styles.prizeCard}>
-              <FaTrophy className={styles.trophyIcon} />
-              <span className={styles.prizeLabel}>{prize.label}</span>
-              <span className={styles.prizeValue}>{prize.value}</span>
+          <div className={styles.prizes}>
+            <h2>Prize Distribution</h2>
+            <div className={styles.prizeGrid}>
+              {loading
+                ? Array(3)
+                    .fill(null)
+                    .map((_, index) => (
+                      <Skeleton
+                        key={index}
+                        height={150}
+                        width="100%"
+                        style={{ marginBottom: "1rem" }}
+                      />
+                    ))
+                : prizeDetails.map((prize, index) => (
+                    <div key={index} className={styles.prizeCard}>
+                      <FaTrophy className={styles.trophyIcon} />
+                      <span className={styles.prizeLabel}>{prize.label}</span>
+                      <span className={styles.prizeValue}>{prize.value}</span>
+                    </div>
+                  ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
 
       <div className={styles.actions}>
-        {/* {event.status !== "Cancelled" &&
-          event.status !== "Live" &&
-          event.status !== "Completed" && (
-            <CustomButton
-              type={
-                event.status === "Created"
-                  ? "primary"
-                  : event.status === "Released"
-                  ? "danger"
-                  : event.status === "Live" || event.status === "Completed"
-                  ? "success"
-                  : "info"
-              }
-              onClick={handleCancel}
-              alert={true}
-            >
-              {getButtonText(event.status)}
-            </CustomButton>
-          )} */}
-        {event.status === "CREATED" && (
-          <CustomButton type="danger" alert={true}>
+      {event?.status === "COMPLETED" && (
+          <CustomButton type="primary" alert={true}>
+            Release Event
+          </CustomButton>
+        )}
+        {event?.status === "CREATED"   && (
+          <CustomButton onClick={handleEventDelete} type="danger" alert={true}>
             Delete Event
           </CustomButton>
         )}
       </div>
 
-      <div className={styles.tabContainer}>
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${
-              activeTab === "matches" ? styles.activeTab : ""
-            }`}
-            onClick={() => setActiveTab("matches")}
-          >
-            Matches
-          </button>
-          {event.status !== "Created" && (
+      {event && (
+        <div className={styles.tabContainer}>
+          <div className={styles.tabs}>
             <button
               className={`${styles.tab} ${
-                activeTab === "teams" ? styles.activeTab : ""
+                activeTab === "matches" ? styles.activeTab : ""
               }`}
-              onClick={() => setActiveTab("teams")}
+              onClick={() => setActiveTab("matches")}
             >
-              Teams
+              Matches
             </button>
-          )}
+            {event.status !== "Created" && (
+              <button
+                className={`${styles.tab} ${
+                  activeTab === "teams" ? styles.activeTab : ""
+                }`}
+                onClick={() => setActiveTab("teams")}
+              >
+                Teams
+              </button>
+            )}
+             {event.status === "COMPLETED" && (
+              <button
+                className={`${styles.tab} ${
+                  activeTab === "results" ? styles.activeTab : ""
+                }`}
+                onClick={() => setActiveTab("results")}
+              >
+                Results
+              </button>
+            )}
+          </div>
+          <div className={styles.tabContent}>
+            {activeTab === "matches" && <MatchesComponent matches={matches} />}
+            {activeTab === "teams" && (
+              <UserTeamComponent
+                teams={generateRandomTeams(50, event.status)}
+              />
+            )}
+            {activeTab === "results" && (
+              <ResultsComponent
+                teams={generateRandomTeams(50, event.status)}
+              />
+            )}
+          </div>
         </div>
-        <div className={styles.tabContent}>
-          {activeTab === "matches" && (
-            <MatchesComponent matches={matches} />
-          )}
-          {activeTab === "teams" && (
-            <UserTeamComponent teams={generateRandomTeams(50, event.status)} />
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };
