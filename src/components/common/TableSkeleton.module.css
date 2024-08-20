@@ -1,0 +1,30 @@
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px;
+  }
+
+  .skeletonTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .skeletonHeader {
+    height: 40px;
+    background-color: #f0f0f0;
+  }
+
+  .skeletonRow {
+    height: 60px;
+  }
+
+  .skeletonCell {
+    padding: 10px;
+  }
+
+  .skeletonBox {
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    width: 100%;
+  }
