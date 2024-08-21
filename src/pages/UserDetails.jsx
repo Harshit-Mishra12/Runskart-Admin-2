@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import CustomButton from "../components/common/CustomButton";
 import styles from "./UserDetails.module.css";
 import {
@@ -19,42 +20,28 @@ import {
 } from "react-icons/fa";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { userTeams } from "../utils/tempData";
+import { fetchuserdetail, verifyuser } from "../redux/userReducer/action";
+import Skeleton from "../components/common/Skeleton";
 
 const UserDetails = () => {
   const { id } = useParams();
+
+  const dispatch = useDispatch();
+  const { userDetail } = useSelector((store) => store.users);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("teams");
+  const [loading, setLoading] = useState(false);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
   const [currentDocument, setCurrentDocument] = useState(null);
-
+  const { user, bank_details, documents } = userDetail || {};
+  console.log("user_documents", userDetail);
   useEffect(() => {
-    const mockUser = {
-      id: id,
-      name: "John Doe",
-      dateRegistered: "2023-01-15",
-      email: "john.doe@example.com",
-      phone: "+1 123-456-7890",
-      dob: "1990-05-20",
-      displayPicture: "https://picsum.photos/200/300/?random=1",
-      verified: true,
-      blocked: false,
-      eventsParticipated: 2,
-      teamsCreated: 3,
-      amountSpent: 900,
-      bankDetails: {
-        accountName: "John Doe",
-        accountNumber: "1234567890",
-        ifscCode: "ABCD0001234",
-      },
-      documents: {
-        aadharFront: "https://picsum.photos/800/600/?random=2",
-        aadharBack: "https://picsum.photos/800/600/?random=3",
-        pancard: "https://picsum.photos/800/600/?random=4",
-      },
-    };
-    setUser(mockUser);
-  }, [id]);
+    const callbackAfter = () => setLoading(false);
+
+    setLoading(true);
+    dispatch(fetchuserdetail(id, callbackAfter));
+  }, [dispatch]);
 
   if (!user) {
     return <div className={styles.loading}>Loading...</div>;
@@ -65,17 +52,19 @@ const UserDetails = () => {
   };
 
   const handleVerify = () => {
-    setUser({ ...user, verified: !user.verified });
+    const callbackAfter = () => {};
+    console.log("handleVerify..", handleVerify);
+    dispatch(verifyuser(id, callbackAfter));
   };
 
   const handleBlock = () => {
     setUser({ ...user, blocked: !user.blocked });
   };
 
-  const handleViewDocument = (documentType) => {
+  const handleViewDocument = (documentType, url) => {
     setCurrentDocument({
-      title: documentType,
-      url: user.documents[documentType],
+      title: "documentType",
+      url: url,
     });
     setShowDocumentViewer(true);
   };
@@ -91,13 +80,13 @@ const UserDetails = () => {
 
       <div className={styles.userProfile}>
         <div className={styles.profilePicture}>
-          <img src={user.displayPicture} alt={user.name} />
+          <img src={user.profile_picture} alt={user.name} />
         </div>
         <div className={styles.profileInfo}>
           <h2>{user.name}</h2>
           <div className={styles.statusButtons}>
             <CustomButton
-              type={user.verified ? "success" : "danger"}
+              type={user.status === "ACTIVE" ? "success" : "danger"}
               onClick={handleVerify}
               alert={true}
               alertMessage={
@@ -106,7 +95,7 @@ const UserDetails = () => {
                   : "Are you sure you want to verify this user?"
               }
             >
-              {user.verified ? (
+              {user.status === "ACTIVE" ? (
                 <>
                   <FaCheckCircle />
                   <span style={{ marginLeft: "0.5rem" }}>Verified</span>
@@ -118,7 +107,7 @@ const UserDetails = () => {
                 </>
               )}
             </CustomButton>
-            <CustomButton
+            {/* <CustomButton
               type={user.blocked ? "danger" : "warning"}
               onClick={handleBlock}
               alert={true}
@@ -139,72 +128,101 @@ const UserDetails = () => {
                   <span style={{ marginLeft: "0.5rem" }}>Active</span>
                 </>
               )}
-            </CustomButton>
+            </CustomButton> */}
           </div>
         </div>
       </div>
 
       <div className={styles.infoGrid}>
-        <InfoCard icon={<FaEnvelope />} label="Email" value={user.email} />
-        <InfoCard icon={<FaPhone />} label="Phone" value={user.phone} />
-        <InfoCard
-          icon={<FaBirthdayCake />}
-          label="Date of Birth"
-          value={user.dob}
-        />
-        <InfoCard
-          icon={<FaCalendarAlt />}
-          label="Registered On"
-          value={user.dateRegistered}
-        />
-        <InfoCard
-          icon={<FaGamepad />}
-          label="Events Participated"
-          value={user.eventsParticipated}
-        />
-        <InfoCard
-          icon={<FaUsers />}
-          label="Teams Created"
-          value={user.teamsCreated}
-        />
-        <InfoCard
-          icon={<FaMoneyBillWave />}
-          label="Amount Spent"
-          value={`₹${user.amountSpent}`}
-        />
+        {loading ? (
+          <>
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+          </>
+        ) : (
+          <>
+            <InfoCard icon={<FaEnvelope />} label="Email" value={user.email} />
+            <InfoCard
+              icon={<FaPhone />}
+              label="Phone"
+              value={user.mobile_number}
+            />
+            <InfoCard
+              icon={<FaBirthdayCake />}
+              label="Date of Birth"
+              value={user.dob}
+            />
+            <InfoCard
+              icon={<FaCalendarAlt />}
+              label="Registered On"
+              value={user.created_at.split("T")[0]}
+            />
+            <InfoCard
+              icon={<FaGamepad />}
+              label="Events Participated"
+              value={user.events_participated ? user.events_participated : 0}
+            />
+            <InfoCard
+              icon={<FaUsers />}
+              label="Teams Created"
+              value={user.teams_created_count ? user.teams_created_count : 0}
+            />
+            <InfoCard
+              icon={<FaMoneyBillWave />}
+              label="Amount Spent"
+              value={`₹${user.amount_spent ? user.amount_spent : 0}`}
+            />
+          </>
+        )}
       </div>
-
       <div className={styles.sectionTitle}>Bank Details</div>
-      <div className={styles.bankDetails}>
+      {loading ? (
+        <Skeleton />
+      ) : (
+        <div className={styles.bankDetails}>
         <p>
-          <strong>Account Name:</strong> {user.bankDetails.accountName}
+          <strong>Account Name:</strong>{" "}
+          {user.user_bank_details ? user.user_bank_details.account_name : "NA"}
         </p>
         <p>
-          <strong>Account Number:</strong> {user.bankDetails.accountNumber}
+          <strong>Account Number:</strong>{" "}
+          {user.user_bank_details
+            ? user.user_bank_details.account_number
+            : "NA"}
         </p>
         <p>
-          <strong>IFSC Code:</strong> {user.bankDetails.ifscCode}
+          <strong>IFSC Code:</strong>{" "}
+          {user.user_bank_details ? user.user_bank_details.ifsc_code : "NA"}
         </p>
       </div>
+      )}
+
+
 
       <div className={styles.sectionTitle}>Documents</div>
-      <div className={styles.documents}>
-        <DocumentCard
-          title="Aadhar Front"
-          filename={user.documents.aadharFront}
-          onView={() => handleViewDocument("aadharFront")}
-        />
-        <DocumentCard
-          title="Aadhar Back"
-          filename={user.documents.aadharBack}
-          onView={() => handleViewDocument("aadharBack")}
-        />
-        <DocumentCard
-          title="PAN Card"
-          filename={user.documents.pancard}
-          onView={() => handleViewDocument("pancard")}
-        />
-      </div>
+      {
+        loading ?(
+          <>
+             <Skeleton/>
+             <Skeleton/>
+          </>
+
+        ):(
+          <div className={styles.documents}>
+          {documents.map((doc) => (
+            <DocumentCard
+              key={doc.id}
+              title={doc.doc_type}
+              filename={doc.doc_url}
+              onView={() => handleViewDocument(doc.doc_type, doc.doc_url)}
+            />
+          ))}
+        </div>
+        )
+      }
+
 
       <div className={styles.actions}>
         <CustomButton type="primary" onClick={handleDownloadReport}>
@@ -246,29 +264,39 @@ const InfoCard = ({ icon, label, value }) => (
   </div>
 );
 
-const DocumentCard = ({ title, filename, onView }) => (
-  <div className={styles.documentCard}>
-    <div className={styles.documentCardInner}>
-      <div className={styles.documentIcon}>
-        <FaFileDownload />
+const DocumentCard = ({ title, filename, onView }) => {
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = filename;
+    link.setAttribute("download", filename.split("/").pop()); // Use the filename from the URL
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  return (
+    <div className={styles.documentCard}>
+      <div className={styles.documentCardInner}>
+        <div className={styles.documentIcon}>
+          <FaFileDownload />
+        </div>
+        <div className={styles.documentInfo}>
+          <div className={styles.documentTitle}>{title}</div>
+        </div>
       </div>
-      <div className={styles.documentInfo}>
-        <div className={styles.documentTitle}>{title}</div>
-        {/* <div className={styles.documentFilename}>{filename}</div> */}
+      <div className={styles.documentActions}>
+        <CustomButton type="outline" size="small" onClick={onView}>
+          <FaEye />
+          <span style={{ marginLeft: "0.5rem" }}>View</span>
+        </CustomButton>
+        <CustomButton type="outline" size="small" onClick={handleDownload}>
+          <FaFileDownload />
+          <span style={{ marginLeft: "0.5rem" }}>Download</span>
+        </CustomButton>
       </div>
     </div>
-    <div className={styles.documentActions}>
-      <CustomButton type="outline" size="small" onClick={onView}>
-        <FaEye />
-        <span style={{ marginLeft: "0.5rem" }}>View</span>
-      </CustomButton>
-      <CustomButton type="outline" size="small">
-        <FaFileDownload />
-        <span style={{ marginLeft: "0.5rem" }}>Download</span>
-      </CustomButton>
-    </div>
-  </div>
-);
+  );
+};
 
 const DocumentViewer = ({ document, onClose }) => (
   <div className={styles.documentViewerOverlay}>

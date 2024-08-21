@@ -205,15 +205,16 @@ const Events = () => {
       </div>
       <div className={styles.pagination}>
         <CustomButton
-          type="secondary"
+          type="primary"
           onClick={handlePreviousPage}
           disabled={currentPage === 1}
         >
           Previous
         </CustomButton>
-        <span>{`Page ${currentPage} of ${totalPages}`}</span>
+        <div className={styles.space}></div>
+        {/* <span>{`Page ${currentPage} of ${totalPages}`}</span> */}
         <CustomButton
-          type="secondary"
+          type="primary"
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
         >

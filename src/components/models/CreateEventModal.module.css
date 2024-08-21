@@ -187,3 +187,25 @@
   margin-top: 0.25rem;
 }
 
+.errorInput {
+  border: 2px solid red;
+}
+
+
+.formGroup {
+  position: relative;
+}
+
+.formGroup.error input,
+.formGroup.error select {
+  border: 2px solid red;
+}
+
+.errorText {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+
+

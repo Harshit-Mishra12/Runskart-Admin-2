@@ -142,3 +142,16 @@
     padding: 1rem;
   }
 }
+
+.input.errorInput,
+.textarea.errorInput {
+  border: 2px solid red;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+  margin-top: -10px;
+
+}
