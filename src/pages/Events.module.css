@@ -124,9 +124,10 @@
 
 .pagination {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-top: 1rem;
+
 }
 .space{
   margin-left: 10px;

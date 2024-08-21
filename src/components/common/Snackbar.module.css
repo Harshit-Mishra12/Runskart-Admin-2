@@ -1,7 +1,7 @@
 .snackbar {
     position: fixed;
     bottom: 20px;
-    left: 50%;
+    left: 10%;
     transform: translateX(-50%);
     padding: 16px;
     border-radius: 8px;
@@ -12,7 +12,7 @@
     opacity: 0.9;
     animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
     display: flex;
-    align-items: center;
+    align-items:center;
   }
 
   @keyframes slideIn {

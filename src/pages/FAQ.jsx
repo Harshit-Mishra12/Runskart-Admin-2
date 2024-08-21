@@ -1,48 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomButton from "../components/common/CustomButton";
 import styles from "./FAQ.module.css";
-
-const initialFaqs = [
-  {
-    id: 1,
-    createdDate: "2023-07-15",
-    question: "How do I create an account?",
-    answer:
-      "To create an account, click on the 'Sign Up' button on the top right corner of the homepage and follow the instructions.",
-  },
-  {
-    id: 2,
-    createdDate: "2023-07-16",
-    question: "What payment methods do you accept?",
-    answer:
-      "We accept credit cards, debit cards, and PayPal for all transactions.",
-  },
-  // Add more FAQ objects as needed
-];
+import { useDispatch, useSelector } from "react-redux";
+import { createfaq, deletefaq, fetchfaq } from "../redux/faqReducer/action";
+import TableSkeleton from "../components/common/TableSkeleton";
 
 const FAQ = () => {
-  const [faqs, setFaqs] = useState(initialFaqs);
+  const { faqList } = useSelector((store) => store.faqs);
+  const dispatch = useDispatch();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState("");
   const [newAnswer, setNewAnswer] = useState("");
+  const [faqData, setFaqData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({ question: "", answer: "" });
+
+  useEffect(() => {
+    const callbackAfterLoginSuccess = (result) => {
+      setLoading(false);
+    };
+    setLoading(true);
+    dispatch(fetchfaq(callbackAfterLoginSuccess)); // Fetch dashboard data
+  }, [dispatch]);
+
+  useEffect(() => {
+    setFaqData(faqList);
+  }, [faqList]);
 
   const handleCreateFAQ = () => {
+    let hasError = false;
+    const newErrors = { question: "", answer: "" };
+
+    if (!newQuestion.trim()) {
+      newErrors.question = "Question is required.";
+      hasError = true;
+    }
+
+    if (!newAnswer.trim()) {
+      newErrors.answer = "Answer is required.";
+      hasError = true;
+    }
+
+    if (hasError) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setLoading(true);
+    const callbackAfter = () => {
+      setLoading(false);
+    };
     if (newQuestion && newAnswer) {
-      const newFaq = {
-        id: faqs.length + 1,
-        createdDate: new Date().toISOString().slice(0, 10),
+      const params = {
         question: newQuestion,
         answer: newAnswer,
       };
-      setFaqs([...faqs, newFaq]);
+      dispatch(createfaq(params, callbackAfter));
       setNewQuestion("");
       setNewAnswer("");
+      setErrors({ question: "", answer: "" });
       setShowCreateModal(false);
     }
   };
 
   const handleDeleteFAQ = (id) => {
-    setFaqs(faqs.filter((faq) => faq.id !== id));
+    const callbackAfter = () => {};
+    dispatch(deletefaq(id, callbackAfter));
   };
 
   return (
@@ -55,40 +78,46 @@ const FAQ = () => {
       </div>
       <div className={styles.statsBar}>
         <div className={styles.stat}>
-          <span className={styles.statValue}>{faqs.length}</span>
+          <span className={styles.statValue}>{faqData.length}</span>
           <span className={styles.statLabel}>Total FAQs</span>
         </div>
       </div>
 
       <div className={styles.tableWrapper}>
-        <table className={styles.faqTable}>
-          <thead>
-            <tr>
-              <th>Created Date</th>
-              <th>Question</th>
-              <th>Answer</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {faqs.map((faq) => (
-              <tr key={faq.id}>
-                <td>{faq.createdDate}</td>
-                <td>{faq.question}</td>
-                <td>{faq.answer}</td>
-                <td>
-                  <CustomButton
-                    type="danger"
-                    size="small"
-                    onClick={() => handleDeleteFAQ(faq.id)}
-                  >
-                    Delete
-                  </CustomButton>
-                </td>
+        {loading ? (
+          <TableSkeleton />
+        ) : (
+          <table className={styles.faqTable}>
+            <thead>
+              <tr>
+                <th>Created Date</th>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {faqData.map((faq) => (
+                <tr key={faq.id}>
+                  <td>{faq.created_at.split("T")[0]}</td>
+                  <td>{faq.question}</td>
+                  <td>{faq.answer}</td>
+                  <td>
+                    <CustomButton
+                      type="danger"
+                      size="small"
+                      onClick={() => handleDeleteFAQ(faq.id)}
+                      alert={true}
+                      alertMessage={"Are you sure you want to delete?"}
+                    >
+                      Delete
+                    </CustomButton>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {showCreateModal && (
@@ -100,16 +129,22 @@ const FAQ = () => {
               placeholder="Question"
               value={newQuestion}
               onChange={(e) => setNewQuestion(e.target.value)}
-              className={styles.input}
+              className={`${styles.input} ${errors.question ? styles.errorInput : ''}`}
             />
+            {errors.question && (
+              <div className={styles.errorMessage}>{errors.question}</div>
+            )}
             <textarea
               placeholder="Answer"
               value={newAnswer}
               onChange={(e) => setNewAnswer(e.target.value)}
-              className={styles.textarea}
+              className={`${styles.textarea} ${errors.answer ? styles.errorInput : ''}`}
             ></textarea>
+            {errors.answer && (
+              <div className={styles.errorMessage}>{errors.answer}</div>
+            )}
             <div className={styles.modalButtons}>
-              <CustomButton type="primary" onClick={handleCreateFAQ}>
+              <CustomButton type="primary" isLoading={loading} onClick={handleCreateFAQ}>
                 Submit
               </CustomButton>
               <CustomButton
