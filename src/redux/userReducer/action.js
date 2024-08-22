@@ -19,9 +19,9 @@ export const fetchusers = (params, callback) => async (dispatch) => {
       };
   try {
     const response = await axios.post(`${API_URL}/admin/users/fetch`, params,config);
-    console.log("response login api before", response.data);
-    if (response.data.status_code === 1 ) {
 
+    if (response.data.status_code === 1 ) {
+      console.log("response fetchusers ", response.data.data);
       dispatch({ type: types.GET_USER_SUCCESS ,payload:response.data.data});
 
       callback( { statusCode: 1, message: "success" });
@@ -93,6 +93,33 @@ export const verifyuser = (id,callback) => async (dispatch) => {
     console.error("dashboard error:", error);
     return { statusCode: 2, message: error.message };
   }
+};
+
+
+export const changestatus = (id,callback) => async (dispatch) => {
+  console.log("check response createevent api :",id);
+  const token = JSON.parse(localStorage.getItem('token'));
+  const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+try {
+  const response = await axios.get(`${API_URL}/admin/users/changestatus/${id}`, config);
+  console.log("response createevent api ", response.data.data);
+  if (response.data.status_code === 1 ) {
+    dispatch(fetchuserdetail(id, callback));
+    callback( { statusCode: 1, message: "success" });
+  }
+  else{
+    callback( { statusCode: 2, message: "fail" });
+  }
+  return { statusCode: 1, message: "success"};
+
+} catch (error) {
+  console.error("dashboard error:", error);
+  return { statusCode: 2, message: error.message };
+}
 };
 
 

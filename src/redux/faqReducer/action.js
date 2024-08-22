@@ -75,7 +75,7 @@ export const deletefaq = (id,callback) => async (dispatch) => {
     if (response.data.status_code === 1 ) {
 
     //   dispatch({ type: types.GET_FAQ_SUCCESS ,payload:response.data.data});
-    dispatch(fetchfaq());
+    dispatch(fetchfaq(callback));
       callback( { statusCode: 1, message: "success" });
     }
     else{

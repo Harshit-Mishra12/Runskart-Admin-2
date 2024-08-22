@@ -9,6 +9,7 @@ const initialState = {
 };
 
 const reducer = (state = initialState, action) => {
+  console.log("check:",action.payload);
   switch (action.type) {
     case types.GET_USER_SUCCESS:
       return {
