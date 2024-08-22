@@ -176,13 +176,15 @@ const Events = () => {
                         )}
                         animated
                         style={{
-                          height: "25px",
+                          height: "18px",
                           border: "1px solid rgba(0,0,0,0.2)",
                           fontSize: "12px",
                           fontWeight: "bold",
                         }}
                       />
+                       {`${event.occupancy}/${event.user_participation_limit}`}
                     </td>
+
                     <td>
                       <EventStatus status={event.status} />
                     </td>
