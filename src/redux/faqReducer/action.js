@@ -17,7 +17,6 @@ export const fetchfaq = (callback) => async (dispatch) => {
       };
   try {
     const response = await axios.get(`${API_URL}/admin/faq/fetch`, config);
-    console.log("response createevent api ", response.data.data);
     if (response.data.status_code === 1 ) {
 
       dispatch({ type: types.GET_FAQ_SUCCESS ,payload:response.data.data});
@@ -44,10 +43,8 @@ export const createfaq = (params,callback) => async (dispatch) => {
       };
   try {
     const response = await axios.post(`${API_URL}/admin/faq/add`, params,config);
-    console.log("response createevent api ", response.data.data);
     if (response.data.status_code === 1 ) {
         dispatch(fetchfaq(callback));
-    //   dispatch({ type: types.CREATE_FAQ ,payload:response.data.data});
       callback( { statusCode: 1, message: "success" });
     }
     else{
@@ -71,7 +68,6 @@ export const deletefaq = (id,callback) => async (dispatch) => {
       };
   try {
     const response = await axios.get(`${API_URL}/admin/faq/delete/${id}`, config);
-    console.log("response deletefaq api ", response.data.data);
     if (response.data.status_code === 1 ) {
 
     //   dispatch({ type: types.GET_FAQ_SUCCESS ,payload:response.data.data});

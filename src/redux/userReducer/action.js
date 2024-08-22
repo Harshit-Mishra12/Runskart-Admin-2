@@ -21,7 +21,7 @@ export const fetchusers = (params, callback) => async (dispatch) => {
     const response = await axios.post(`${API_URL}/admin/users/fetch`, params,config);
 
     if (response.data.status_code === 1 ) {
-      console.log("response fetchusers ", response.data.data);
+
       dispatch({ type: types.GET_USER_SUCCESS ,payload:response.data.data});
 
       callback( { statusCode: 1, message: "success" });
@@ -40,7 +40,7 @@ export const fetchusers = (params, callback) => async (dispatch) => {
 
 
 export const fetchuserdetail = (id,callback) => async (dispatch) => {
-    console.log("check response createevent api :",id);
+
     const token = JSON.parse(localStorage.getItem('token'));
     const config = {
         headers: {
@@ -49,7 +49,7 @@ export const fetchuserdetail = (id,callback) => async (dispatch) => {
       };
   try {
     const response = await axios.get(`${API_URL}/admin/users/fetch/${id}`, config);
-    console.log("response createevent api ", response.data.data);
+
     if (response.data.status_code === 1 ) {
 
       dispatch({ type: types.GET_USERDETAIL_SUCCESS ,payload:response.data.data});
@@ -68,7 +68,7 @@ export const fetchuserdetail = (id,callback) => async (dispatch) => {
 };
 
 export const verifyuser = (id,callback) => async (dispatch) => {
-    console.log("check response createevent api :",id);
+
     const token = JSON.parse(localStorage.getItem('token'));
     const config = {
         headers: {
@@ -77,7 +77,7 @@ export const verifyuser = (id,callback) => async (dispatch) => {
       };
   try {
     const response = await axios.get(`${API_URL}/admin/users/verify/${id}`, config);
-    console.log("response createevent api ", response.data.data);
+
     if (response.data.status_code === 1 ) {
 
       dispatch({ type: types.GET_VERIFY_SUCCESS ,payload:response.data.data});
@@ -97,7 +97,7 @@ export const verifyuser = (id,callback) => async (dispatch) => {
 
 
 export const changestatus = (id,callback) => async (dispatch) => {
-  console.log("check response createevent api :",id);
+
   const token = JSON.parse(localStorage.getItem('token'));
   const config = {
       headers: {
@@ -106,7 +106,7 @@ export const changestatus = (id,callback) => async (dispatch) => {
     };
 try {
   const response = await axios.get(`${API_URL}/admin/users/changestatus/${id}`, config);
-  console.log("response createevent api ", response.data.data);
+
   if (response.data.status_code === 1 ) {
     dispatch(fetchuserdetail(id, callback));
     callback( { statusCode: 1, message: "success" });

@@ -29,13 +29,11 @@ const UserDetails = () => {
   const dispatch = useDispatch();
   const { userDetail } = useSelector((store) => store.users);
   const navigate = useNavigate();
-  // const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("teams");
   const [loading, setLoading] = useState(false);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
   const [currentDocument, setCurrentDocument] = useState(null);
   const { user, bank_details, documents } = userDetail || {};
-  console.log("user_documents", userDetail);
   useEffect(() => {
     const callbackAfter = () => setLoading(false);
 
@@ -43,23 +41,17 @@ const UserDetails = () => {
     dispatch(fetchuserdetail(id, callbackAfter));
   }, [dispatch]);
 
-  // if (!user) {
-  //   return <div className={styles.loading}>Loading...</div>;
-  // }
-
   const handleDownloadReport = () => {
     console.log("Downloading player report...");
   };
 
   const handleVerify = () => {
     const callbackAfter = () => {};
-    console.log("handleVerify..", handleVerify);
     dispatch(verifyuser(id, callbackAfter));
   };
 
   const handleUpdateStatus = () => {
     const callbackAfter = () => {};
-    console.log("handleUpdateStatus..", handleUpdateStatus);
     dispatch(changestatus(id, callbackAfter));
   };
 
@@ -307,7 +299,7 @@ const DocumentCard = ({ title, filename, onView }) => {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Download failed:', error);
+
     }
   };
 
