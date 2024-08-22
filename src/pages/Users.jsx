@@ -17,7 +17,6 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const totalPages = Math.ceil(totalUsers / userPerPage);
-  console.log("search:", usersList);
   // Debounce the fetchUsers function, but only when searchTerm changes
   const debouncedFetchUsers = useCallback(
     _.debounce((term) => {
@@ -39,9 +38,7 @@ const Users = () => {
         };
       }
 
-      // setLoading(true);
-
-      dispatch(fetchusers(params, callbackAfter));
+    dispatch(fetchusers(params, callbackAfter));
     }, 1000), // 2 seconds debounce
     [currentPage] // Dependencies include currentPage so it uses the latest value
   );
@@ -60,7 +57,6 @@ const Users = () => {
 
   // Call the debounced function only when searchTerm changes
   useEffect(() => {
-    // setCurrentPage(1);
     debouncedFetchUsers(searchTerm);
     return debouncedFetchUsers.cancel; // Cleanup on unmount or when searchTerm changes
   }, [searchTerm, debouncedFetchUsers]);

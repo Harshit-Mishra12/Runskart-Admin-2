@@ -39,7 +39,7 @@ export const dashboard = (callback) => async (dispatch) => {
 
 
 export const eventcount = (params,callback) => async (dispatch) => {
-    console.log("check response eventcount api ");
+
     const token = JSON.parse(localStorage.getItem('token'));
     const config = {
         headers: {
@@ -48,7 +48,7 @@ export const eventcount = (params,callback) => async (dispatch) => {
       };
   try {
     const response = await axios.post(`${API_URL}/admin/events/count`,params,config);
-    console.log("response dashboard api ", response.data);
+
     if (response.data.status_code === 1 ) {
 
       dispatch({ type: types.GET_EVENTCOUNT_SUCCESS ,payload:response.data.data});

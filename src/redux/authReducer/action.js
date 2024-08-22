@@ -12,7 +12,7 @@ import * as types from "./actionTypes";
 export const login = (params, callback) => async (dispatch) => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, params);
-    console.log("response login api before", response.data);
+
     if (response.data.status_code === 1 ) {
 
       dispatch({ type: types.GET_LOGIN_SUCCESS ,payload:response.data.data});

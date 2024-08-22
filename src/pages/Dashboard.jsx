@@ -30,7 +30,7 @@ const Dashboard = () => {
       setLoading(false);
     };
     setLoading(true);
-    dispatch(fetchDashboardData(callbackAfterLoginSuccess)); // Fetch dashboard data
+    dispatch(fetchDashboardData(callbackAfterLoginSuccess));
   }, [dispatch]);
 
   useEffect(() => {
