@@ -186,6 +186,7 @@ const EventDetails = () => {
             {loading ? (
               <Skeleton height={30} width="100%" />
             ) : (
+              <>
               <ProgressBar
                 now={occupancyPercentage}
                 label={`${occupancy}/${userParticipationLimit}`}
@@ -194,7 +195,10 @@ const EventDetails = () => {
                 className={styles.progressBar}
                 style={{ textAlign: "center" }} // Ensure label is centered
               />
+              {`${occupancy}/${userParticipationLimit}`}
+              </>
             )}
+
           </div>
 
           <div className={styles.prizes}>
