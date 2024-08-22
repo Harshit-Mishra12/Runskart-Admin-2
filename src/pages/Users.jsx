@@ -12,30 +12,27 @@ const Users = () => {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
   const userPerPage = 5; // Adjust as needed
-  const { usersList, totalVerifiedUser, totalUnVerifiedUser, totalUsers } = useSelector((store) => store.users);
+  const { usersList, totalVerifiedUser, totalUnVerifiedUser, totalUsers } =
+    useSelector((store) => store.users);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const totalPages = Math.ceil(totalUsers / userPerPage);
-
+  console.log("search:", usersList);
   // Debounce the fetchUsers function, but only when searchTerm changes
   const debouncedFetchUsers = useCallback(
     _.debounce((term) => {
-      const callbackAfter = () =>
-        {
-          setLoading(false);
-
-        }
-      let params="";
-      if(term === "")
-      {
-         params = {
+      const callbackAfter = () => {
+        setLoading(false);
+      };
+      let params = "";
+      if (term === "") {
+        params = {
           per_page: userPerPage,
           page: currentPage,
           search_name: term,
         };
-      }
-      else if(term != ""){
-         params = {
+      } else if (term != "") {
+        params = {
           per_page: userPerPage,
           page: 1,
           search_name: term,
@@ -43,7 +40,7 @@ const Users = () => {
       }
 
       // setLoading(true);
-      console.log("search:",params);
+
       dispatch(fetchusers(params, callbackAfter));
     }, 1000), // 2 seconds debounce
     [currentPage] // Dependencies include currentPage so it uses the latest value
@@ -113,11 +110,10 @@ const Users = () => {
         </div>
       </div>
       <div className={styles.tableWrapper}>
-        {
-          loading ? (
-            <TableSkeleton />
-          ) : (
-            <table className={styles.usersTable}>
+        {loading ? (
+          <TableSkeleton />
+        ) : (
+          <table className={styles.usersTable}>
             <thead>
               <tr>
                 <th>Name</th>
@@ -148,14 +144,21 @@ const Users = () => {
                   <td>
                     <span
                       style={{
-                        backgroundColor: user.verified ? "#d4edda" : "#f8d7da",
+                        backgroundColor:
+                          user.status === "ACTIVE" ? "#d4edda" : "#f8d7da",
                         padding: "0.5rem 1rem",
                         borderRadius: "0.5rem",
-                        color: user.verified ? "#155724" : "#721c24",
+                        color: user.status === "ACTIVE" ? "#155724" : "#721c24",
                         fontWeight: "bold",
                       }}
                     >
-                      {user.status === "ACTIVE" ? "Verified" : "Unverified"}
+                      {user.status === "ACTIVE"
+                        ? "Verified"
+                        : user.status === "INACTIVE"
+                        ? "Blocked"
+                        : user.status === "VERIFICATIONPENDING"
+                        ? "Unverified"
+                        : "Unknown Status"}
                     </span>
                   </td>
                   <td>
@@ -172,9 +175,7 @@ const Users = () => {
               ))}
             </tbody>
           </table>
-          )
-        }
-
+        )}
       </div>
       <div className={styles.pagination}>
         <CustomButton

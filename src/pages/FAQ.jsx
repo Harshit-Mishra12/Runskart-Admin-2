@@ -64,7 +64,14 @@ const FAQ = () => {
   };
 
   const handleDeleteFAQ = (id) => {
-    const callbackAfter = () => {};
+    setLoading(true);
+    const callbackAfter = (result) => {
+      if(result.statusCode === 1)
+      {
+        setLoading(false);
+      }
+
+    };
     dispatch(deletefaq(id, callbackAfter));
   };
 

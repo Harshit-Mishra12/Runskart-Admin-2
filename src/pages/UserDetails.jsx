@@ -20,7 +20,7 @@ import {
 } from "react-icons/fa";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { userTeams } from "../utils/tempData";
-import { fetchuserdetail, verifyuser } from "../redux/userReducer/action";
+import { changestatus, fetchuserdetail, verifyuser } from "../redux/userReducer/action";
 import Skeleton from "../components/common/Skeleton";
 
 const UserDetails = () => {
@@ -43,9 +43,9 @@ const UserDetails = () => {
     dispatch(fetchuserdetail(id, callbackAfter));
   }, [dispatch]);
 
-  if (!user) {
-    return <div className={styles.loading}>Loading...</div>;
-  }
+  // if (!user) {
+  //   return <div className={styles.loading}>Loading...</div>;
+  // }
 
   const handleDownloadReport = () => {
     console.log("Downloading player report...");
@@ -57,8 +57,10 @@ const UserDetails = () => {
     dispatch(verifyuser(id, callbackAfter));
   };
 
-  const handleBlock = () => {
-    setUser({ ...user, blocked: !user.blocked });
+  const handleUpdateStatus = () => {
+    const callbackAfter = () => {};
+    console.log("handleUpdateStatus..", handleUpdateStatus);
+    dispatch(changestatus(id, callbackAfter));
   };
 
   const handleViewDocument = (documentType, url) => {
@@ -80,55 +82,66 @@ const UserDetails = () => {
 
       <div className={styles.userProfile}>
         <div className={styles.profilePicture}>
-          <img src={user.profile_picture} alt={user.name} />
+          <img src={user && user.profile_picture} alt={ user && user.name} />
         </div>
         <div className={styles.profileInfo}>
-          <h2>{user.name}</h2>
+          <h2>{user && user.name} {user && user.status === "ACTIVE" ? (
+                  <>
+                    <FaCheckCircle />
+                  </>
+                ) :""}</h2>
+
           <div className={styles.statusButtons}>
+            {
+             user && user.status === "VERIFICATIONPENDING" && (
+                <CustomButton
+                type={user.status === "ACTIVE" ? "success" : "danger"}
+                onClick={handleVerify}
+                alert={true}
+                alertMessage={
+                  user && user.verified
+                    ? "Are you sure you want to unverify this user?"
+                    : "Are you sure you want to verify this user?"
+                }
+              >
+                {user && user.status === "ACTIVE" ? (
+                  <>
+                    <FaCheckCircle />
+                    <span style={{ marginLeft: "0.5rem" }}>Verified</span>
+                  </>
+                ) : (
+                  <>
+                    <FaTimesCircle />
+                    <span style={{ marginLeft: "0.5rem" }}>Unverified</span>
+                  </>
+                )}
+              </CustomButton>
+              )
+            }
+
             <CustomButton
-              type={user.status === "ACTIVE" ? "success" : "danger"}
-              onClick={handleVerify}
+
+              type={user && user.status === "ACTIVE" ? "danger" : "warning"}
+              onClick={handleUpdateStatus}
               alert={true}
               alertMessage={
-                user.verified
-                  ? "Are you sure you want to unverify this user?"
-                  : "Are you sure you want to verify this user?"
+                user && user.status === "ACTIVE"
+                  ? "Are you sure you want to block this user?"
+                  : "Are you sure you want to unblock this user?"
               }
             >
-              {user.status === "ACTIVE" ? (
-                <>
-                  <FaCheckCircle />
-                  <span style={{ marginLeft: "0.5rem" }}>Verified</span>
-                </>
-              ) : (
-                <>
-                  <FaTimesCircle />
-                  <span style={{ marginLeft: "0.5rem" }}>Unverified</span>
-                </>
-              )}
-            </CustomButton>
-            {/* <CustomButton
-              type={user.blocked ? "danger" : "warning"}
-              onClick={handleBlock}
-              alert={true}
-              alertMessage={
-                user.blocked
-                  ? "Are you sure you want to unblock this user?"
-                  : "Are you sure you want to block this user?"
-              }
-            >
-              {user.blocked ? (
+              {user && user.status === "ACTIVE" ? (
                 <>
                   <FaBan />
-                  <span style={{ marginLeft: "0.5rem" }}>Blocked</span>
+                  <span style={{ marginLeft: "0.5rem" }}>Block</span>
                 </>
               ) : (
                 <>
                   <FaUnlock />
-                  <span style={{ marginLeft: "0.5rem" }}>Active</span>
+                  <span style={{ marginLeft: "0.5rem" }}>Activate</span>
                 </>
               )}
-            </CustomButton> */}
+            </CustomButton>
           </div>
         </div>
       </div>
@@ -143,36 +156,36 @@ const UserDetails = () => {
           </>
         ) : (
           <>
-            <InfoCard icon={<FaEnvelope />} label="Email" value={user.email} />
+            <InfoCard icon={<FaEnvelope />} label="Email" value={user && user.email} />
             <InfoCard
               icon={<FaPhone />}
               label="Phone"
-              value={user.mobile_number}
+              value={user && user.mobile_number}
             />
             <InfoCard
               icon={<FaBirthdayCake />}
               label="Date of Birth"
-              value={user.dob}
+              value={user && user.dob}
             />
             <InfoCard
               icon={<FaCalendarAlt />}
               label="Registered On"
-              value={user.created_at.split("T")[0]}
+              value={user && user.created_at.split("T")[0]}
             />
             <InfoCard
               icon={<FaGamepad />}
               label="Events Participated"
-              value={user.events_participated ? user.events_participated : 0}
+              value={user && user.events_participated ? user.events_participated : 0}
             />
             <InfoCard
               icon={<FaUsers />}
               label="Teams Created"
-              value={user.teams_created_count ? user.teams_created_count : 0}
+              value={user && user.teams_created_count ? user.teams_created_count : 0}
             />
             <InfoCard
               icon={<FaMoneyBillWave />}
               label="Amount Spent"
-              value={`₹${user.amount_spent ? user.amount_spent : 0}`}
+              value={`₹${user && user.amount_spent ? user.amount_spent : 0}`}
             />
           </>
         )}
@@ -184,17 +197,17 @@ const UserDetails = () => {
         <div className={styles.bankDetails}>
         <p>
           <strong>Account Name:</strong>{" "}
-          {user.user_bank_details ? user.user_bank_details.account_name : "NA"}
+          {user && user.user_bank_details ? user.user_bank_details.account_name : "NA"}
         </p>
         <p>
           <strong>Account Number:</strong>{" "}
-          {user.user_bank_details
+          {user && user.user_bank_details
             ? user.user_bank_details.account_number
             : "NA"}
         </p>
         <p>
           <strong>IFSC Code:</strong>{" "}
-          {user.user_bank_details ? user.user_bank_details.ifsc_code : "NA"}
+          {user && user.user_bank_details ? user.user_bank_details.ifsc_code : "NA"}
         </p>
       </div>
       )}
@@ -211,7 +224,7 @@ const UserDetails = () => {
 
         ):(
           <div className={styles.documents}>
-          {documents.map((doc) => (
+          {user && documents.map((doc) => (
             <DocumentCard
               key={doc.id}
               title={doc.doc_type}
@@ -265,14 +278,41 @@ const InfoCard = ({ icon, label, value }) => (
 );
 
 const DocumentCard = ({ title, filename, onView }) => {
-  const handleDownload = () => {
-    const link = document.createElement("a");
-    link.href = filename;
-    link.setAttribute("download", filename.split("/").pop()); // Use the filename from the URL
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(filename, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/octet-stream',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Extract the filename from the URL
+      const fileName = filename.split('/').pop();
+
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
   };
+
+
+
 
   return (
     <div className={styles.documentCard}>
