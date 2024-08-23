@@ -511,7 +511,7 @@ const CreateEventModal = ({
                 <CustomButton type="secondary" onClick={onClose}>
                   Cancel
                 </CustomButton>
-                <CustomButton type="primary" onClick={handleSubmit}>
+                <CustomButton type="primary" isLoading={loading} onClick={handleSubmit}>
                   {edit ? "Save Changes" : "Create Event"}
                 </CustomButton>
               </div>
