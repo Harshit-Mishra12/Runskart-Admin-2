@@ -14,7 +14,7 @@
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .card {
@@ -33,7 +33,7 @@
 }
 
 .cardIcon {
-  font-size: 2rem;
+  font-size: 1rem;
   color: #3498db;
   margin-bottom: 1rem;
 }
@@ -43,20 +43,20 @@
 }
 
 .cardTitle {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: #7f8c8d;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
 }
 
 .cardValue {
-  font-size: 1rem;
+  font-size: 1.4rem;
   color: #2c3e50;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
 .cardSubtitle {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: #95a5a6;
 }
 
