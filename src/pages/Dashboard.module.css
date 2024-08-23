@@ -13,14 +13,14 @@
 
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 2rem;
 }
 
 .card {
   background-color: #ffffff;
   border-radius: 15px;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@
 }
 
 .cardIcon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: #3498db;
   margin-bottom: 1rem;
 }
@@ -43,13 +43,13 @@
 }
 
 .cardTitle {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #7f8c8d;
   margin-bottom: 0.5rem;
 }
 
 .cardValue {
-  font-size: 2rem;
+  font-size: 1.4rem;
   color: #2c3e50;
   font-weight: bold;
   margin-bottom: 0.5rem;

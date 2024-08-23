@@ -10,9 +10,9 @@ import {
   FaCalendarAlt,
   FaTrophy,
   FaUsers,
-  FaMoneyBillWave,
-  FaGamepad,
+  FaRupeeSign
 } from "react-icons/fa";
+import { MdSportsCricket } from "react-icons/md";
 import Skeleton from "../components/common/Skeleton";
 
 const Dashboard = () => {
@@ -56,7 +56,7 @@ const Dashboard = () => {
           <Card
             icon={<FaCalendarAlt />}
             title="Events Created"
-            value={eventscount?.total_events || "No data available"}
+            value={eventscount?.total_events || "N/A"}
             dropdown={
               <select
                 value={eventsPeriod}
@@ -77,7 +77,7 @@ const Dashboard = () => {
             icon={<FaTrophy />}
             title="Last Event Winner"
             value={
-              dashboardData?.latest_winner?.user_name || "No data available"
+              dashboardData?.latest_winner?.user_name || "N/A"
             }
             subtitle={`Winner of ${
               dashboardData?.latest_winner?.event || "No event available"
@@ -90,7 +90,7 @@ const Dashboard = () => {
           <Card
             icon={<FaUsers />}
             title="Users Registered"
-            value={dashboardData?.total_users || "No data available"}
+            value={dashboardData?.total_users || "N/A"}
             subtitle="Total Users"
           />
         )}
@@ -98,9 +98,9 @@ const Dashboard = () => {
           <Skeleton />
         ) : (
           <Card
-            icon={<FaMoneyBillWave />}
+            icon={<FaRupeeSign />}
             title="Amount Obtained"
-            value={`₹${dashboardData?.amount_obtained || "No data available"}`}
+            value={`₹${dashboardData?.amount_obtained || "N/A"}`}
             dropdown={
               <select
                 value={amountPeriod}
@@ -118,9 +118,9 @@ const Dashboard = () => {
           <Skeleton />
         ) : (
           <Card
-            icon={<FaGamepad />}
+            icon={<MdSportsCricket />}
             title="Matches Today"
-            value={dashboardData?.matches_today || "No data available"}
+            value={dashboardData?.matches_today || "N/A"}
             subtitle="Scheduled Matches"
           />
         )}
