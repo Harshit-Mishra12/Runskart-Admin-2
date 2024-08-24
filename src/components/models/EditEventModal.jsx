@@ -3,33 +3,19 @@ import styles from "./CreateEventModal.module.css";
 import CustomButton from "../common/CustomButton";
 import { tempMatches } from "../../utils/tempData";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { createevent, fetchmatches } from "../../redux/eventReducer/action";
-import { useDispatch, useSelector } from "react-redux";
-import Spinner from "../common/Spinner";
-import SkeletonListCard from "../common/SkeletonListCard";
 import classNames from "classnames";
+import { updateevent } from "../../redux/eventReducer/action";
+import { useDispatch } from "react-redux";
 import Snackbar from "../common/Snackbar";
 
-const CreateEventModal = ({
-  edit = false,
-  event,
-  eventFormCreated,
-  eventsLoading,
-}) => {
-  const dispatch = useDispatch();
-  const { matchesList } = useSelector((store) => store.events);
+const EditEventModal = ({ edit = false, event,eventId, prizes ,otherPrizes,matchesCount}) => {
+    const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const [matchesData, setMatchesData] = useState([]);
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [errors, setErrors] = useState({});
+  console.log("EditEventModal:",matchesCount);
   const [loading, setLoading] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
-  const [snackbarSeverity, setSnackbarSeverity] = useState(null);
   const [eventData, setEventData] = useState({
     name: "",
-    goLiveDate: "",
-    matches: [],
     teamSizeLimit: "",
     batsmanLimit: "",
     bowlerLimit: "",
@@ -37,30 +23,74 @@ const CreateEventModal = ({
     teamCreationCost: "",
     userParticipationLimit: "",
     winnersLimit: "",
-    prizes: [{ rank: 1, prize_amount: "" }],
+    prizes: [{ rank: 1, amount: "" }],
     otherPrizes: "",
   });
   const [maxTeamSize, setMaxTeamSize] = useState(0);
-
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [snackbarSeverity, setSnackbarSeverity] = useState(null);
   useEffect(() => {
     const calculateMaxTeamSize = () => {
-      const numberOfTeams = eventData.matches.length*22; // Assuming there are always 4 teams
+      const numberOfTeams = matchesCount*22; // Assuming there are always 4 teams
       const playersPerTeam = 11; // Number of players per team
       setMaxTeamSize(numberOfTeams);
     };
 
     calculateMaxTeamSize();
-  }, [eventData.matches]);
-  const displaySnackbar = () => {
-    setSnackbarMessage("Check for  Validations!");
-    setSnackbarSeverity("error");
+  }, [matchesCount]);
+  useEffect(() => {
+    if (event) {
+      setEventData({
+        ...event,
+        teamSizeLimit: event.team_size,
+        batsmanLimit: event.batsman_limit,
+        bowlerLimit: event.bowler_limit,
+        allRounderLimit: event.all_rounder_limit,
+        teamCreationCost: event.team_creation_cost,
+        userParticipationLimit: event.user_participation_limit,
+        winnersLimit: event.winners_limit,
+        otherPrizes:otherPrizes,
+        prizes: prizes || [{ rank: 1, amount: "" }],
+      });
+    }
+  }, [edit, event, isOpen,otherPrizes]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEventData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleMatchesChange = (selectedMatches) => {
+    setEventData((prevData) => ({ ...prevData, matches: selectedMatches }));
+  };
+
+  const handlePrizeChange = (index, field, value) => {
+    const updatedPrizes = [...eventData.prizes];
+    updatedPrizes[index][field] = value;
+    setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
+  };
+
+  const addPrize = () => {
+    setEventData((prevData) => ({
+      ...prevData,
+      prizes: [
+        ...prevData.prizes,
+        { rank: prevData.prizes.length + 1,rank_from:prevData.prizes.length + 1,rank_to:prevData.prizes.length + 1, prize_amount: "" },
+      ],
+    }));
+  };
+
+  const removePrize = (index) => {
+    setEventData((prevData) => ({
+      ...prevData,
+      prizes: prevData.prizes.filter((_, i) => i !== index),
+    }));
   };
   const validate = () => {
     const newErrors = {};
 
     if (!eventData.name) newErrors.name = "Event Name is required";
-    // if (!eventData.goLiveDate)
-    //   newErrors.goLiveDate = "Go Live Date is required";
+
     if (eventData.teamSizeLimit < 11) {
       newErrors.teamSizeLimit = "Team size limit cannot be less than 11";
     } else if (eventData.teamSizeLimit > maxTeamSize) {
@@ -101,9 +131,7 @@ const CreateEventModal = ({
         "Winners Limit must be less than user Participation Limit value";
     }
 
-    if (eventData.matches.length === 0) {
-      newErrors.matches = "Select at least one match";
-    }
+
     eventData.prizes.forEach((prize, index) => {
       if (prize.prize_amount <= 0) {
         newErrors[`prize_amount_${index}`] =
@@ -114,104 +142,40 @@ const CreateEventModal = ({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  useEffect(() => {
-    const callbackFunction = (result) => {
-      if (result.statusCode == 1) {
-        setLoading(false);
-      }
-    };
-    const params = {
-      date: date,
-    };
-    setLoading(true);
-    setEventData((prevData) => ({ ...prevData, matches: [] }));
-    dispatch(fetchmatches(params, callbackFunction));
-  }, [date]);
-
-  useEffect(() => {
-    if (edit && event) {
-      setEventData({
-        ...event,
-        prizes: event.prizes || [{ rank: 1, amount: "" }],
-      });
-    }
-  }, [edit, event, isOpen]);
-  const handleGoLiveDateChange = (e) => {
-    const newDate = e.target.value;
-    setEventData((prevData) => ({ ...prevData, goLiveDate: newDate }));
-    setDate(newDate); // Update date state whenever goLiveDate changes
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEventData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleMatchesChange = (selectedMatches) => {
-    setEventData((prevData) => ({ ...prevData, matches: selectedMatches }));
-  };
-
-  const handlePrizeChange = (index, field, value) => {
-    const updatedPrizes = [...eventData.prizes];
-    updatedPrizes[index][field] = value;
-    setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
-  };
-
-  const addPrize = () => {
-    setEventData((prevData) => ({
-      ...prevData,
-      prizes: [
-        ...prevData.prizes,
-        { rank: prevData.prizes.length + 1, prize_amount: "" },
-      ],
-    }));
-  };
-
-  const removePrize = (index) => {
-    setEventData((prevData) => ({
-      ...prevData,
-      prizes: prevData.prizes.filter((_, i) => i !== index),
-    }));
-  };
-
-  const callbackFunction = (result) => {
-    if (result.statusCode == 1) {
-      setLoading(false);
-      setFormLoading(false);
-      onClose();
-      eventFormCreated();
-    }
+    const displaySnackbar = () => {
+    setSnackbarMessage("Check for  Validations!");
+    setSnackbarSeverity("error");
   };
   const handleSubmit = () => {
-    console.log("matches list:", eventData.matches);
     if (!validate())
 
-      {
-        displaySnackbar();
-        return;
-      }
-    // e.preventDefault();
-    setLoading(true);
-    setFormLoading(true);
-    console.log("handleSubmit:");
+        {
+          displaySnackbar();
+        console.log("check errors:",errors);
+          return;
+        }
     onCreateEvent(eventData);
+    // onClose();
+    setLoading(true);
     const params = {
-      name: eventData.name,
-      go_live_date: date,
-      team_size: eventData.teamSizeLimit,
-      batsman_limit: eventData.batsmanLimit,
-      bowler_limit: eventData.bowlerLimit,
-      all_rounder_limit: eventData.allRounderLimit,
-      team_creation_cost: eventData.teamCreationCost,
-      user_participation_limit: eventData.userParticipationLimit,
-      winners_limit: eventData.winnersLimit,
-      prizes: eventData.prizes,
-      other_prizes: eventData.otherPrizes,
-      matches: eventData.matches,
-    };
-    console.log("handleSubmit:", params);
-    // return
-    dispatch(createevent(params, callbackFunction));
+        event_id:eventId,
+        name: eventData.name,
+        team_size: eventData.teamSizeLimit,
+        batsman_limit: eventData.batsmanLimit,
+        bowler_limit: eventData.bowlerLimit,
+        all_rounder_limit: eventData.allRounderLimit,
+        team_creation_cost: eventData.teamCreationCost,
+        user_participation_limit: eventData.userParticipationLimit,
+        winners_limit: eventData.winnersLimit,
+        prizes: eventData.prizes,
+        other_prizes: eventData.otherPrizes,
+      };
+      console.log("check:",params);
+      const callbackFunction=()=>{
+        setLoading(false);
+        onClose();
+      }
+      dispatch(updateevent(params, callbackFunction));
   };
 
   const onCreateEvent = (eventData) => {
@@ -231,14 +195,13 @@ const CreateEventModal = ({
       teamCreationCost: "",
       userParticipationLimit: "",
       winnersLimit: "",
-      prizes: [{ rank: 1, prize_amount: "" }],
+      prizes: [{ rank: 1, amount: "" }],
     });
   };
 
   return (
     <>
-      {formLoading &&  <Spinner />}
-      {snackbarMessage && (
+     {snackbarMessage && (
         <Snackbar
           message={snackbarMessage}
           severity={snackbarSeverity}
@@ -246,14 +209,14 @@ const CreateEventModal = ({
         />
       )}
       <CustomButton type="primary" onClick={() => setIsOpen(true)}>
-        {edit ? "Edit Event" : "Create New Event"}
+        {edit ? "Edit Event" : "Edit Event"}
       </CustomButton>
 
       {isOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h2 className={styles.modalTitle}>
-              {edit ? "Edit Event" : "Create New Event"}
+              {edit ? "Edit Event" : "Edit Event"}
             </h2>
             <button
               style={{
@@ -269,7 +232,7 @@ const CreateEventModal = ({
               <XMarkIcon className={styles.closeIcon} />
             </button>
 
-            <div className={styles.form}>
+            <div  className={styles.form}>
             <div className={classNames(styles.formGroup, { [styles.error]: errors.name })}>
                 <label htmlFor="name">Event Name</label>
                 <input
@@ -280,62 +243,13 @@ const CreateEventModal = ({
                   onChange={handleChange}
                   required
                 />
-                {errors.name && (
+                  {errors.name && (
                   <span className={styles.error}>{errors.name}</span>
                 )}
               </div>
-              <div className={styles.formGroup}>
 
-                <label htmlFor="goLiveDate">Go Live Date</label>
-                <input
-                  type="date"
-                  id="goLiveDate"
-                  name="goLiveDate"
-                  value={date}
-                  onChange={handleGoLiveDateChange}
-                  min={new Date().toISOString().split("T")[0]}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-
-                <label htmlFor="matches">Matches</label>
-                <div className={styles.matchesContainer}>
-                  {loading ? (
-                    <>
-                      <SkeletonListCard /> <SkeletonListCard /> <SkeletonListCard />
-                    </>
-                  ) : (
-                    matchesList &&
-                    matchesList.map((match) => (
-                      <div
-                        key={match.id}
-                        className={`${styles.matchItem} ${
-                          eventData.matches.some((m) => m.id === match.id)
-                            ? styles.selected
-                            : ""
-                        }`}
-                        onClick={() => {
-                          const updatedMatches = eventData.matches.some(
-                            (m) => m.id === match.id
-                          )
-                            ? eventData.matches.filter((m) => m.id !== match.id)
-                            : [...eventData.matches, match];
-                          handleMatchesChange(updatedMatches);
-                        }}
-                      >
-                        {match.name}{','}{match.dateTime.split(' ')[1]}
-                      </div>
-                    ))
-                  )}
-                </div>
-                {errors.matches && (
-                  <div className={styles.error}>{errors.matches}</div>
-                )}
-              </div>
               <div className={styles.formRow}>
-
-                <div className={classNames(styles.formGroup, { [styles.error]: errors.teamSizeLimit })}>
+              <div className={classNames(styles.formGroup, { [styles.error]: errors.teamSizeLimit })}>
                   <label htmlFor="teamSizeLimit">Team Size Limit</label>
                   <input
                     type="number"
@@ -345,9 +259,9 @@ const CreateEventModal = ({
                     onChange={handleChange}
                     required
                   />
-                  {errors.teamSizeLimit && (
-                    <span className={styles.error}>{errors.teamSizeLimit}</span>
-                  )}
+                    {errors.teamSizeLimit && (
+                  <span className={styles.error}>{errors.teamSizeLimit}</span>
+                )}
                 </div>
                 <div className={classNames(styles.formGroup, { [styles.error]: errors.batsmanLimit })}>
                   <label htmlFor="batsmanLimit">Batsman Limit</label>
@@ -359,9 +273,9 @@ const CreateEventModal = ({
                     onChange={handleChange}
                     required
                   />
-                  {errors.batsmanLimit && (
-                    <span className={styles.error}>{errors.batsmanLimit}</span>
-                  )}
+                     {errors.batsmanLimit && (
+                  <span className={styles.error}>{errors.batsmanLimit}</span>
+                )}
                 </div>
               </div>
               <div className={styles.formRow}>
@@ -375,9 +289,9 @@ const CreateEventModal = ({
                     onChange={handleChange}
                     required
                   />
-                  {errors.bowlerLimit && (
-                    <span className={styles.error}>{errors.bowlerLimit}</span>
-                  )}
+                    {errors.bowlerLimit && (
+                  <span className={styles.error}>{errors.bowlerLimit}</span>
+                )}
                 </div>
                 <div className={classNames(styles.formGroup, { [styles.error]: errors.allRounderLimit })}>
                   <label htmlFor="allRounderLimit">All-Rounder Limit</label>
@@ -389,11 +303,9 @@ const CreateEventModal = ({
                     onChange={handleChange}
                     required
                   />
-                  {errors.allRounderLimit && (
-                    <span className={styles.error}>
-                      {errors.allRounderLimit}
-                    </span>
-                  )}
+                      {errors.allRounderLimit && (
+                  <span className={styles.error}>{errors.allRounderLimit}</span>
+                )}
                 </div>
               </div>
               {errors.playerLimits && (
@@ -409,10 +321,8 @@ const CreateEventModal = ({
                   onChange={handleChange}
                   required
                 />
-                {errors.teamCreationCost && (
-                  <span className={styles.error}>
-                    {errors.teamCreationCost}
-                  </span>
+                       {errors.teamCreationCost && (
+                  <span className={styles.error}>{errors.teamCreationCost}</span>
                 )}
               </div>
               <div className={classNames(styles.formGroup, { [styles.error]: errors.userParticipationLimit })}>
@@ -427,10 +337,8 @@ const CreateEventModal = ({
                   onChange={handleChange}
                   required
                 />
-                {errors.userParticipationLimit && (
-                  <span className={styles.error}>
-                    {errors.userParticipationLimit}
-                  </span>
+                    {errors.userParticipationLimit && (
+                  <span className={styles.error}>{errors.userParticipationLimit}</span>
                 )}
               </div>
               <div className={classNames(styles.formGroup, { [styles.error]: errors.winnersLimit })}>
@@ -443,44 +351,55 @@ const CreateEventModal = ({
                   onChange={handleChange}
                   required
                 />
-                {errors.winnersLimit && (
+                  {errors.winnersLimit && (
                   <span className={styles.error}>{errors.winnersLimit}</span>
                 )}
               </div>
               <div className={styles.formGroup}>
                 <label>Prizes</label>
-                {eventData.prizes.map((prize, index) => (
-                  <div key={index} className={styles.prizeRow}>
-                    <input
-                      type="number"
-                      value={prize.rank}
-                      onChange={(e) =>
-                        handlePrizeChange(index, "rank", e.target.value)
-                      }
-                      placeholder="Rank"
-                      className={styles.prizeRank}
-                    />
-                    <input
-                      type="number"
-                      value={prize.prize_amount}
-                      onChange={(e) =>
-                        handlePrizeChange(index, "prize_amount", e.target.value)
-                      }
-                      placeholder="Amount"
-                      className={styles.prizeAmount}
-                    />
-                    {errors[`prize_amount_${index}`] && (
+                {eventData.prizes.map(
+                  (prize, index) =>
+                   (
+                      <div key={index} className={styles.prizeRow}>
+                        <input
+                          type="number"
+                          value={prize.rank_from}
+                          onChange={(e) =>
+                            handlePrizeChange(
+                              index,
+                              "rank",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Rank From"
+                          className={styles.prizeRank}
+                        />
+                        <input
+                          type="number"
+                          value={prize.prize_amount}
+                          onChange={(e) =>
+                            handlePrizeChange(
+                              index,
+                              "prize_amount",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Amount"
+                          className={styles.prizeAmount}
+                        />
+                        {errors[`prize_amount_${index}`] && (
                       <div className={styles.error}>
                         {errors[`prize_amount_${index}`]}
                       </div>
                     )}
-                  </div>
-                ))}
+                      </div>
+                    )
+                )}
+
                 <div>
                   <CustomButton
                     type="button"
                     onClick={addPrize}
-
                     className={styles.addButton}
                   >
                     Add Prize
@@ -495,18 +414,17 @@ const CreateEventModal = ({
                   </CustomButton>
                 </div>
               </div>
-              <div className={classNames(styles.formGroup, { [styles.error]: errors.otherPrizes })}>
+              <div className={styles.formGroup}>
                 <label htmlFor="otherPrizes">Other Prizes</label>
                 <input
                   type="number"
                   id="otherPrizes"
                   name="otherPrizes"
-                  value={eventData.otherPrizes}
+                  value={
+                    otherPrizes && eventData.otherPrizes
+                  }
                   onChange={handleChange}
                 />
-                {errors.otherPrizes && (
-                  <span className={styles.error}>{errors.otherPrizes}</span>
-                )}
               </div>
               <div className={styles.buttonGroup}>
                 <CustomButton type="secondary" onClick={onClose}>
@@ -524,4 +442,4 @@ const CreateEventModal = ({
   );
 };
 
-export default CreateEventModal;
+export default EditEventModal;

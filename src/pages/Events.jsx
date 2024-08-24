@@ -27,9 +27,8 @@ const Events = () => {
     if (result.statusCode === 1) {
       setloading(false);
       setSubmitButtonLoading(false);
-      setClearButtonLoading(false)
+      setClearButtonLoading(false);
     }
-    console.log("Events fetched successfully");
   };
 
   useEffect(() => {
@@ -55,7 +54,6 @@ const Events = () => {
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
   };
   const eventFormCreated = () => {
-
     setCurrentPage(1); // Reset to the first page
     fetchEvents();
   };
@@ -115,11 +113,21 @@ const Events = () => {
           placeholder="Select Date"
           className={styles.dateInput}
         />
-        <CustomButton type="primary"  isLoading={submitButtonLoading} onClick={handleDateSubmit} height="40px">
+        <CustomButton
+          type="primary"
+          isLoading={submitButtonLoading}
+          onClick={handleDateSubmit}
+          height="40px"
+        >
           Submit
         </CustomButton>
         <div className={styles.space}></div>
-        <CustomButton type="secondary" isLoading={clearButtonLoading} onClick={handleClearDate} height="40px">
+        <CustomButton
+          type="secondary"
+          isLoading={clearButtonLoading}
+          onClick={handleClearDate}
+          height="40px"
+        >
           Clear
         </CustomButton>
       </div>
@@ -150,6 +158,7 @@ const Events = () => {
                   "Creation Cost",
                   "Occupancy",
                   "Status",
+                  "Active Status",
                   "Actions",
                 ].map((header) => (
                   <th key={header}>{header}</th>
@@ -182,11 +191,14 @@ const Events = () => {
                           fontWeight: "bold",
                         }}
                       />
-                       {`${event.occupancy}/${event.user_participation_limit}`}
+                      {`${event.occupancy}/${event.user_participation_limit}`}
                     </td>
 
                     <td>
                       <EventStatus status={event.status} />
+                    </td>
+                    <td>
+                      <EventStatus status={event.activate_status} />
                     </td>
                     <td>
                       <div style={{ margin: "5px" }}>
