@@ -8,7 +8,10 @@ import {
   FaUsers,
   FaTrophy,
   FaMoneyBillWave,
+  FaBan,
+  FaUnlock,
 } from "react-icons/fa";
+
 import { TbCricket } from "react-icons/tb";
 import { BiCricketBall } from "react-icons/bi";
 import { MdSportsCricket } from "react-icons/md";
@@ -19,9 +22,14 @@ import MatchesComponent from "../components/eventDetails/MatchesComponent";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { generateRandomTeams } from "../utils/tempData";
 import { useDispatch, useSelector } from "react-redux";
-import { eventdelete, fetcheventdetail } from "../redux/eventReducer/action";
+import {
+  changestatus,
+  eventdelete,
+  fetcheventdetail,
+} from "../redux/eventReducer/action";
 import Skeleton from "../components/common/Skeleton";
-import ResultsComponent from '../components/eventDetails/ResultsComponent'
+import ResultsComponent from "../components/eventDetails/ResultsComponent";
+import EditEventModal from "../components/models/EditEventModal";
 
 const EventDetails = () => {
   const dispatch = useDispatch();
@@ -29,6 +37,7 @@ const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("matches");
+  const [statusChanged, setStatusChanged] = useState(false);
   const [loading, setLoading] = useState(false);
   const callback = (result) => {
     if (result.statusCode === 1) {
@@ -36,7 +45,6 @@ const EventDetails = () => {
     }
   };
   useEffect(() => {
-
     setLoading(true);
     dispatch(fetcheventdetail(id, callback)); // Fetch event detail
   }, [dispatch, id]);
@@ -46,11 +54,17 @@ const EventDetails = () => {
   const occupancyPercentage = userParticipationLimit
     ? (occupancy / userParticipationLimit) * 100
     : 0;
-  const handleEventDelete=()=>{
+
+  const handleEventDelete = () => {
     setLoading(true);
     dispatch(eventdelete(id, callback));
+  };
+  const handleUpdateStatus = () => {
+    setLoading(true);
+    dispatch(changestatus(id, callback));
+    setStatusChanged(true);
+  };
 
-  }
   const getColor = (total, filled) => {
     if (filled / total >= 0.9) return "success";
     if (filled / total >= 0.7) return "info";
@@ -61,20 +75,21 @@ const EventDetails = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "CREATED":
-        return colors.primary;   // E.g., blue for CREATED
+        return colors.primary; // E.g., blue for CREATED
       case "RELEASED":
         return colors.secondary; // E.g., green for RELEASED
       case "LIVE":
-        return colors.success;   // E.g., dark green for LIVE
+        return colors.success; // E.g., dark green for LIVE
       case "COMPLETED":
-        return colors.info;      // E.g., light blue for COMPLETED
+        return colors.info; // E.g., light blue for COMPLETED
       case "CANCELLED":
-        return colors.danger;    // E.g., red for CANCELLED
+        return colors.danger; // E.g., red for CANCELLED
+      case "UPCOMING":
+        return colors.info;
       default:
-        return colors.default;   // E.g., gray for unknown status
+        return colors.default; // E.g., gray for unknown status
     }
   };
-
 
   const eventDetails = [
     {
@@ -139,8 +154,50 @@ const EventDetails = () => {
   return (
     <div className={styles.eventDetailsContainer}>
       <div className={styles.header}>
-        <h1>{event?.name}</h1>
+        <div className={styles.headerLeft}>
+          <h1>{event?.name}</h1>
+          <div className={styles.statusButtons}>
+            {loading ? (
+              <Skeleton height={30} width="100%" />
+            ) : (
+              <CustomButton
+                type={"primary"}
+                onClick={handleUpdateStatus}
+                disabled={
+                  (event && event.status !== "UPCOMING") ||
+                  (event && event.activate_status === "ACTIVE")
+                }
+                alert={true}
+                alertMessage={
+                  event && event.activate_status === "INACTIVE"
+                    ? "Are you sure you want to Activate the Event?"
+                    : ""
+                }
+              >
+                {statusChanged ? <FaUnlock /> : <FaBan />}
+
+                <span style={{ marginLeft: "0.5rem" }}>
+                  {event && event.activate_status}
+                </span>
+              </CustomButton>
+            )}
+          </div>
+        </div>
         <div style={{ display: "flex", gap: "1rem" }}>
+          {/* <CustomButton type="outline" onClick={() => navigate("/events")}>
+            EDIT
+          </CustomButton> */}
+          <EditEventModal
+            event={event}
+            eventId={id}
+            matchesCount={matches && matches.length}
+            prizes={prizes && prizes.length > 0 ? prizes.slice(0, -1) : []}
+            otherPrizes={
+              prizes && prizes.length > 0
+                ? prizes[prizes.length - 1].prize_amount
+                : ""
+            }
+          />
           <CustomButton type="outline" onClick={() => navigate("/events")}>
             Back to Events
           </CustomButton>
@@ -187,18 +244,17 @@ const EventDetails = () => {
               <Skeleton height={30} width="100%" />
             ) : (
               <>
-              <ProgressBar
-                now={occupancyPercentage}
-                label={`${occupancy}/${userParticipationLimit}`}
-                variant={getColor(userParticipationLimit, occupancy)}
-                animated
-                className={styles.progressBar}
-                style={{ textAlign: "center" }} // Ensure label is centered
-              />
-              {`${occupancy}/${userParticipationLimit}`}
+                <ProgressBar
+                  now={occupancyPercentage}
+                  label={`${occupancy}/${userParticipationLimit}`}
+                  variant={getColor(userParticipationLimit, occupancy)}
+                  animated
+                  className={styles.progressBar}
+                  style={{ textAlign: "center" }} // Ensure label is centered
+                />
+                {`${occupancy}/${userParticipationLimit}`}
               </>
             )}
-
           </div>
 
           <div className={styles.prizes}>
@@ -228,12 +284,12 @@ const EventDetails = () => {
       )}
 
       <div className={styles.actions}>
-      {event?.status === "COMPLETED" && (
+        {event?.status === "COMPLETED" && (
           <CustomButton type="primary" alert={true}>
             Release Event
           </CustomButton>
         )}
-        {event?.status === "CREATED"   && (
+        {event?.status === "CREATED" && (
           <CustomButton onClick={handleEventDelete} type="danger" alert={true}>
             Delete Event
           </CustomButton>
@@ -261,7 +317,7 @@ const EventDetails = () => {
                 Teams
               </button>
             )}
-             {event.status === "COMPLETED" && (
+            {event.status === "COMPLETED" && (
               <button
                 className={`${styles.tab} ${
                   activeTab === "results" ? styles.activeTab : ""
@@ -280,9 +336,7 @@ const EventDetails = () => {
               />
             )}
             {activeTab === "results" && (
-              <ResultsComponent
-                teams={generateRandomTeams(50, event.status)}
-              />
+              <ResultsComponent teams={generateRandomTeams(50, event.status)} />
             )}
           </div>
         </div>
