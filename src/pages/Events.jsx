@@ -29,7 +29,6 @@ const Events = () => {
       setSubmitButtonLoading(false);
       setClearButtonLoading(false)
     }
-    console.log("Events fetched successfully");
   };
 
   useEffect(() => {
