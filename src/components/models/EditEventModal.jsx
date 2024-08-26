@@ -8,7 +8,7 @@ import { updateevent } from "../../redux/eventReducer/action";
 import { useDispatch } from "react-redux";
 import Snackbar from "../common/Snackbar";
 
-const EditEventModal = ({ edit = false, event,eventId, prizes ,otherPrizes,matchesCount}) => {
+const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,otherPrizes,matchesCount,eventActiveStatus}) => {
     const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [errors, setErrors] = useState({});
@@ -208,7 +208,7 @@ const EditEventModal = ({ edit = false, event,eventId, prizes ,otherPrizes,match
           onClose={() => setSnackbarMessage(null)}
         />
       )}
-      <CustomButton type="primary" onClick={() => setIsOpen(true)}>
+      <CustomButton disabled={eventStatus !== "UPCOMING" || eventActiveStatus === "ACTIVE" ? eventStatus :false} type="primary" onClick={() => setIsOpen(true)}>
         {edit ? "Edit Event" : "Edit Event"}
       </CustomButton>
 
