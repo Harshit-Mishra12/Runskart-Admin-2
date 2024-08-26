@@ -10,6 +10,7 @@ import {
   FaMoneyBillWave,
   FaBan,
   FaUnlock,
+  FaCheckCircle
 } from "react-icons/fa";
 
 import { TbCricket } from "react-icons/tb";
@@ -161,7 +162,7 @@ const EventDetails = () => {
               <Skeleton height={30} width="100%" />
             ) : (
               <CustomButton
-                type={"primary"}
+                type={event && event.activate_status === "ACTIVE" ? "success" :"danger"}
                 onClick={handleUpdateStatus}
                 disabled={
                   (event && event.status !== "UPCOMING") ||
@@ -174,7 +175,7 @@ const EventDetails = () => {
                     : ""
                 }
               >
-                {statusChanged ? <FaUnlock /> : <FaBan />}
+                {event && event.activate_status === "ACTIVE"  ? <FaCheckCircle /> : <FaBan />}
 
                 <span style={{ marginLeft: "0.5rem" }}>
                   {event && event.activate_status}
