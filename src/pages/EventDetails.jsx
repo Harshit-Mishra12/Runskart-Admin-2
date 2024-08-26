@@ -188,6 +188,8 @@ const EventDetails = () => {
             EDIT
           </CustomButton> */}
           <EditEventModal
+            eventStatus={event?.status}
+            eventActiveStatus={event && event.activate_status}
             event={event}
             eventId={id}
             matchesCount={matches && matches.length}
