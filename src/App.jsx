@@ -12,6 +12,7 @@ import {
 } from './pages/index';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './Route/ProtectedRoute';
+import MatchPlayers from './pages/MatchPlayers';
 
 
 function App() {
@@ -30,6 +31,10 @@ function App() {
           <Route
             path="events/:id"
             element={<ProtectedRoute element={<EventDetails />} />}
+          />
+          <Route
+            path="events/match/:id"
+            element={<ProtectedRoute element={<MatchPlayers />} />}
           />
           <Route
             path="users"

@@ -205,3 +205,61 @@ try {
   return { statusCode: 2, message: error.message };
 }
 };
+
+
+export const fetchmatchplayerslist = (id,callback) => async (dispatch) => {
+  console.log("fetcheventdetail:");
+    const token = JSON.parse(localStorage.getItem('token'));
+    const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  try {
+    const response = await axios.get(`${API_URL}/admin/events/matches/players/fetch/${id}`, config);
+
+    if (response.data.status_code === 1 ) {
+
+      dispatch({ type: types.GET_EVENTPLAYERSLIST_SUCCESS ,payload:response.data.data});
+
+      callback( { statusCode: 1, message: "success" });
+    }
+    else{
+      callback( { statusCode: 2, message: "fail" });
+    }
+    return { statusCode: 1, message: "success"};
+
+  } catch (error) {
+    console.error("dashboard error:", error);
+    return { statusCode: 2, message: error.message };
+  }
+};
+
+export const updateplayingstatus = (params,callback) => async (dispatch) => {
+
+  const token = JSON.parse(localStorage.getItem('token'));
+  const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+try {
+  const response = await axios.post(`${API_URL}/admin/events/players/playingStatus`,params,config);
+
+  if (response.data.status_code === 1 ) {
+
+
+
+    callback( { statusCode: 1, message: "success" });
+  }
+  else{
+    callback( { statusCode: 2, message: "fail" });
+  }
+  return { statusCode: 1, message: "success"};
+
+} catch (error) {
+  console.error("dashboard error:", error);
+  return { statusCode: 2, message: error.message };
+}
+};
+
