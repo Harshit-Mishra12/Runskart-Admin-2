@@ -25,6 +25,7 @@ const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,other
     winnersLimit: "",
     prizes: [{ rank: 1, amount: "" }],
     otherPrizes: "",
+    teamLimitPerUser:""
   });
   const [maxTeamSize, setMaxTeamSize] = useState(0);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
@@ -51,12 +52,14 @@ const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,other
         winnersLimit: event.winners_limit,
         otherPrizes:otherPrizes,
         prizes: prizes || [{ rank: 1, amount: "" }],
+        teamLimitPerUser:event.team_limit_per_user
       });
     }
   }, [edit, event, isOpen,otherPrizes]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("onchange:",name," ",value);
     setEventData((prevData) => ({ ...prevData, [name]: value }));
   };
 
@@ -111,6 +114,8 @@ const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,other
       newErrors.playerLimits =
         "The sum of Batsman Limit, Bowler Limit, and All-Rounder Limit cannot be greater than Team Size Limit";
     }
+    if (eventData.teamLimitPerUser < 1)
+      newErrors.teamLimitPerUser = "Team Limit Per User must be greater than 0";
     if (!eventData.teamCreationCost || eventData.teamCreationCost < 0)
       newErrors.teamCreationCost = "Team Creation Cost cannot be negative";
     if (!eventData.otherPrizes || eventData.otherPrizes <= 0)
@@ -169,8 +174,10 @@ const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,other
         winners_limit: eventData.winnersLimit,
         prizes: eventData.prizes,
         other_prizes: eventData.otherPrizes,
+        team_limit_per_user: eventData.teamLimitPerUser,
       };
       console.log("check:",params);
+
       const callbackFunction=()=>{
         setLoading(false);
         onClose();
@@ -196,6 +203,7 @@ const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,other
       userParticipationLimit: "",
       winnersLimit: "",
       prizes: [{ rank: 1, amount: "" }],
+      teamLimitPerUser:""
     });
   };
 
@@ -261,6 +269,20 @@ const EditEventModal = ({ edit = false,eventStatus, event,eventId, prizes ,other
                   />
                     {errors.teamSizeLimit && (
                   <span className={styles.error}>{errors.teamSizeLimit}</span>
+                )}
+                </div>
+                <div className={classNames(styles.formGroup, { [styles.error]: errors.teamLimitPerUser })}>
+                  <label htmlFor="teamLimitPerUser">Team Limit Per User</label>
+                  <input
+                    type="number"
+                    id="teamLimitPerUser"
+                    name="teamLimitPerUser"
+                    value={eventData.teamLimitPerUser}
+                    onChange={handleChange}
+                    required
+                  />
+                    {errors.teamLimitPerUser && (
+                  <span className={styles.error}>{errors.teamLimitPerUser}</span>
                 )}
                 </div>
                 <div className={classNames(styles.formGroup, { [styles.error]: errors.batsmanLimit })}>

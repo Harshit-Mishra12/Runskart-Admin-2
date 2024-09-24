@@ -39,12 +39,13 @@ const CreateEventModal = ({
     winnersLimit: "",
     prizes: [{ rank: 1, prize_amount: "" }],
     otherPrizes: "",
+    teamLimitPerUser: "",
   });
   const [maxTeamSize, setMaxTeamSize] = useState(0);
 
   useEffect(() => {
     const calculateMaxTeamSize = () => {
-      const numberOfTeams = eventData.matches.length*22; // Assuming there are always 4 teams
+      const numberOfTeams = eventData.matches.length * 22; // Assuming there are always 4 teams
       const playersPerTeam = 11; // Number of players per team
       setMaxTeamSize(numberOfTeams);
     };
@@ -81,6 +82,9 @@ const CreateEventModal = ({
       newErrors.playerLimits =
         "The sum of Batsman Limit, Bowler Limit, and All-Rounder Limit cannot be greater than Team Size Limit";
     }
+    if (eventData.teamLimitPerUser < 1)
+      newErrors.teamLimitPerUser = "Team Limit Per User must be greater than 0";
+
     if (!eventData.teamCreationCost || eventData.teamCreationCost < 0)
       newErrors.teamCreationCost = "Team Creation Cost cannot be negative";
     if (!eventData.otherPrizes || eventData.otherPrizes <= 0)
@@ -184,12 +188,10 @@ const CreateEventModal = ({
   };
   const handleSubmit = () => {
     console.log("matches list:", eventData.matches);
-    if (!validate())
-
-      {
-        displaySnackbar();
-        return;
-      }
+    if (!validate()) {
+      displaySnackbar();
+      return;
+    }
     // e.preventDefault();
     setLoading(true);
     setFormLoading(true);
@@ -208,6 +210,7 @@ const CreateEventModal = ({
       prizes: eventData.prizes,
       other_prizes: eventData.otherPrizes,
       matches: eventData.matches,
+      team_limit_per_user: eventData.teamLimitPerUser,
     };
     console.log("handleSubmit:", params);
     // return
@@ -232,12 +235,14 @@ const CreateEventModal = ({
       userParticipationLimit: "",
       winnersLimit: "",
       prizes: [{ rank: 1, prize_amount: "" }],
+      teamLimitPerUser: "",
+      
     });
   };
 
   return (
     <>
-      {formLoading &&  <Spinner />}
+      {formLoading && <Spinner />}
       {snackbarMessage && (
         <Snackbar
           message={snackbarMessage}
@@ -270,7 +275,11 @@ const CreateEventModal = ({
             </button>
 
             <div className={styles.form}>
-            <div className={classNames(styles.formGroup, { [styles.error]: errors.name })}>
+              <div
+                className={classNames(styles.formGroup, {
+                  [styles.error]: errors.name,
+                })}
+              >
                 <label htmlFor="name">Event Name</label>
                 <input
                   type="text"
@@ -285,7 +294,6 @@ const CreateEventModal = ({
                 )}
               </div>
               <div className={styles.formGroup}>
-
                 <label htmlFor="goLiveDate">Go Live Date</label>
                 <input
                   type="date"
@@ -298,12 +306,12 @@ const CreateEventModal = ({
                 />
               </div>
               <div className={styles.formGroup}>
-
                 <label htmlFor="matches">Matches</label>
                 <div className={styles.matchesContainer}>
                   {loading ? (
                     <>
-                      <SkeletonListCard /> <SkeletonListCard /> <SkeletonListCard />
+                      <SkeletonListCard /> <SkeletonListCard />{" "}
+                      <SkeletonListCard />
                     </>
                   ) : (
                     matchesList &&
@@ -324,7 +332,9 @@ const CreateEventModal = ({
                           handleMatchesChange(updatedMatches);
                         }}
                       >
-                        {match.name}{','}{match.dateTime.split(' ')[1]}
+                        {match.name}
+                        {","}
+                        {match.dateTime.split(" ")[1]}
                       </div>
                     ))
                   )}
@@ -333,9 +343,12 @@ const CreateEventModal = ({
                   <div className={styles.error}>{errors.matches}</div>
                 )}
               </div>
-              <div className={styles.formRow}>
 
-                <div className={classNames(styles.formGroup, { [styles.error]: errors.teamSizeLimit })}>
+                <div
+                  className={classNames(styles.formGroup, {
+                    [styles.error]: errors.teamSizeLimit,
+                  })}
+                >
                   <label htmlFor="teamSizeLimit">Team Size Limit</label>
                   <input
                     type="number"
@@ -349,7 +362,32 @@ const CreateEventModal = ({
                     <span className={styles.error}>{errors.teamSizeLimit}</span>
                   )}
                 </div>
-                <div className={classNames(styles.formGroup, { [styles.error]: errors.batsmanLimit })}>
+                <div className={styles.formRow}>
+                <div
+                  className={classNames(styles.formGroup, {
+                    [styles.error]: errors.teamLimitPerUser,
+                  })}
+                >
+                  <label htmlFor="teamLimitPerUser">Team Limit Per User</label>
+                  <input
+                    type="number"
+                    id="teamLimitPerUser"
+                    name="teamLimitPerUser"
+                    value={eventData.teamLimitPerUser}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.teamLimitPerUser && (
+                    <span className={styles.error}>
+                      {errors.teamLimitPerUser}
+                    </span>
+                  )}
+                </div>
+                <div
+                  className={classNames(styles.formGroup, {
+                    [styles.error]: errors.batsmanLimit,
+                  })}
+                >
                   <label htmlFor="batsmanLimit">Batsman Limit</label>
                   <input
                     type="number"
@@ -363,9 +401,14 @@ const CreateEventModal = ({
                     <span className={styles.error}>{errors.batsmanLimit}</span>
                   )}
                 </div>
+
               </div>
               <div className={styles.formRow}>
-              <div className={classNames(styles.formGroup, { [styles.error]: errors.bowlerLimit })}>
+                <div
+                  className={classNames(styles.formGroup, {
+                    [styles.error]: errors.bowlerLimit,
+                  })}
+                >
                   <label htmlFor="bowlerLimit">Bowler Limit</label>
                   <input
                     type="number"
@@ -379,7 +422,11 @@ const CreateEventModal = ({
                     <span className={styles.error}>{errors.bowlerLimit}</span>
                   )}
                 </div>
-                <div className={classNames(styles.formGroup, { [styles.error]: errors.allRounderLimit })}>
+                <div
+                  className={classNames(styles.formGroup, {
+                    [styles.error]: errors.allRounderLimit,
+                  })}
+                >
                   <label htmlFor="allRounderLimit">All-Rounder Limit</label>
                   <input
                     type="number"
@@ -399,7 +446,11 @@ const CreateEventModal = ({
               {errors.playerLimits && (
                 <div className={styles.error}>{errors.playerLimits}</div>
               )}
-              <div className={classNames(styles.formGroup, { [styles.error]: errors.teamCreationCost })}>
+              <div
+                className={classNames(styles.formGroup, {
+                  [styles.error]: errors.teamCreationCost,
+                })}
+              >
                 <label htmlFor="teamCreationCost">Team Creation Cost</label>
                 <input
                   type="number"
@@ -415,7 +466,11 @@ const CreateEventModal = ({
                   </span>
                 )}
               </div>
-              <div className={classNames(styles.formGroup, { [styles.error]: errors.userParticipationLimit })}>
+              <div
+                className={classNames(styles.formGroup, {
+                  [styles.error]: errors.userParticipationLimit,
+                })}
+              >
                 <label htmlFor="userParticipationLimit">
                   User Participation Limit
                 </label>
@@ -433,7 +488,11 @@ const CreateEventModal = ({
                   </span>
                 )}
               </div>
-              <div className={classNames(styles.formGroup, { [styles.error]: errors.winnersLimit })}>
+              <div
+                className={classNames(styles.formGroup, {
+                  [styles.error]: errors.winnersLimit,
+                })}
+              >
                 <label htmlFor="winnersLimit">Winners Limit</label>
                 <input
                   type="number"
@@ -480,7 +539,6 @@ const CreateEventModal = ({
                   <CustomButton
                     type="button"
                     onClick={addPrize}
-
                     className={styles.addButton}
                   >
                     Add Prize
@@ -495,7 +553,11 @@ const CreateEventModal = ({
                   </CustomButton>
                 </div>
               </div>
-              <div className={classNames(styles.formGroup, { [styles.error]: errors.otherPrizes })}>
+              <div
+                className={classNames(styles.formGroup, {
+                  [styles.error]: errors.otherPrizes,
+                })}
+              >
                 <label htmlFor="otherPrizes">Other Prizes</label>
                 <input
                   type="number"
@@ -512,7 +574,11 @@ const CreateEventModal = ({
                 <CustomButton type="secondary" onClick={onClose}>
                   Cancel
                 </CustomButton>
-                <CustomButton type="primary" isLoading={loading} onClick={handleSubmit}>
+                <CustomButton
+                  type="primary"
+                  isLoading={loading}
+                  onClick={handleSubmit}
+                >
                   {edit ? "Save Changes" : "Create Event"}
                 </CustomButton>
               </div>
