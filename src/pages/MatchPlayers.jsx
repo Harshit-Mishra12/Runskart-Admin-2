@@ -4,14 +4,11 @@ import styles from "./FAQ.module.css";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  createfaq,
-  deletefaq,
-  fetchfaq,
-  updatefaq,
-} from "../redux/faqReducer/action";
+  fetchmatchplayerslist,
+  updateplayingstatus,
+} from "../redux/eventReducer/action";
 import TableSkeleton from "../components/common/TableSkeleton";
 import PlayersComponent from "../components/eventDetails/PlayersComponent";
-import { fetchmatchplayerslist, updateplayingstatus } from "../redux/eventReducer/action";
 import Snackbar from "../components/common/Snackbar";
 
 const MatchPlayers = () => {
@@ -23,6 +20,7 @@ const MatchPlayers = () => {
   const [updatedPlayers, setUpdatedPlayers] = useState([]); // State for tracking updated players
   const [snackbarMessage, setSnackbarMessage] = useState(null);
   const [snackbarSeverity, setSnackbarSeverity] = useState(null);
+
   // Fetch players list when component mounts or id changes
   useEffect(() => {
     const callbackAfterSuccess = (result) => {
@@ -31,7 +29,7 @@ const MatchPlayers = () => {
 
     setLoading(true); // Start loading
     dispatch(fetchmatchplayerslist(id, callbackAfterSuccess)); // Fetch players data for the given event ID
-  }, []);
+  }, [dispatch, id]);
 
   // Update playersListData and updatedPlayers when playersList from Redux store changes
   useEffect(() => {
@@ -40,7 +38,10 @@ const MatchPlayers = () => {
       setUpdatedPlayers(
         playersList.map((player) => ({
           match_player_id: player.id, // Initialize with player.id as match_player_id
-          playing_status: player.playing_status === 'UNANNOUNCED' ?  'NOTPLAYING':player.playing_status, // Use current playing status or default to 'NOTPLAYING'
+          playing_status:
+            player.playing_status === "UNANNOUNCED"
+              ? "NOTPLAYING"
+              : player.playing_status, // Use current playing status or default to 'NOTPLAYING'
         }))
       );
     }
@@ -50,24 +51,39 @@ const MatchPlayers = () => {
   const handlePlayersStatusChange = (updatedPlayers) => {
     setUpdatedPlayers(updatedPlayers); // Update the state with the changes
   };
-  console.log("updated check:",updatedPlayers);
-  // Handle submit to update playing status in the database
+
+  // Validation function to check if at least 11 players have the status "PLAYING"
+  const validatePlayersSelection = () => {
+    const playingCount = updatedPlayers.filter(
+      (player) => player.playing_status === "PLAYING"
+    ).length;
+    return playingCount == 22;
+  };
+
+  // Handle form submission
   const handleSubmit = () => {
+    if (!validatePlayersSelection()) {
+      // If validation fails, show an error message in Snackbar
+      displaySnackbar("22 players must be set to PLAYING", "error");
+      return;
+    }
+
     const callbackAfterUpdate = () => {
-      console.log('Status updated successfully');
-    //   setLoading(false);
-    displaySnackbar();
+      console.log("Status updated successfully");
+      displaySnackbar("Submitted!", "success");
     };
-    // setLoading(true);
+
     dispatch(updateplayingstatus(updatedPlayers, callbackAfterUpdate)); // Dispatch action to update the playing status
   };
-  const displaySnackbar = () => {
-    setSnackbarMessage(" Submited!");
-    setSnackbarSeverity("success");
+
+  const displaySnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
   };
+
   return (
     <div className={styles.faqContainer}>
-         {snackbarMessage && (
+      {snackbarMessage && (
         <Snackbar
           message={snackbarMessage}
           severity={snackbarSeverity}
@@ -76,7 +92,7 @@ const MatchPlayers = () => {
       )}
       <div className={styles.header}>
         <h1>Match Players</h1>
-        <CustomButton  type="primary" onClick={handleSubmit}>
+        <CustomButton type="primary" onClick={handleSubmit}>
           Submit
         </CustomButton>
       </div>
