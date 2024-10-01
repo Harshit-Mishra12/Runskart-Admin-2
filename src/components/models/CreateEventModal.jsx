@@ -32,6 +32,7 @@ const CreateEventModal = ({
     matches: [],
     teamSizeLimit: "",
     batsmanLimit: "",
+    wicketkeeperLimit: "",
     bowlerLimit: "",
     allRounderLimit: "",
     teamCreationCost: "",
@@ -72,6 +73,9 @@ const CreateEventModal = ({
       newErrors.batsmanLimit = "Batsman Limit must be greater than 0";
     if (!eventData.bowlerLimit || eventData.bowlerLimit <= 0)
       newErrors.bowlerLimit = "Bowler Limit must be greater than 0";
+    if (!eventData.wicketkeeperLimit || eventData.wicketkeeperLimit <= 0)
+      newErrors.wicketkeeperLimit = "wicket keeper Limit must be greater than 0";
+
     if (!eventData.allRounderLimit || eventData.allRounderLimit <= 0)
       newErrors.allRounderLimit = "All-Rounder Limit must be greater than 0";
     const totalPlayerLimit =
@@ -207,6 +211,7 @@ const CreateEventModal = ({
       team_creation_cost: eventData.teamCreationCost,
       user_participation_limit: eventData.userParticipationLimit,
       winners_limit: eventData.winnersLimit,
+      wicketkeeper_limit:eventData.wicketkeeperLimit,
       prizes: eventData.prizes,
       other_prizes: eventData.otherPrizes,
       matches: eventData.matches,
@@ -228,6 +233,7 @@ const CreateEventModal = ({
       goLiveDate: "",
       matches: [],
       teamSizeLimit: "",
+      wicketkeeperLimit:"",
       batsmanLimit: "",
       bowlerLimit: "",
       allRounderLimit: "",
@@ -236,7 +242,7 @@ const CreateEventModal = ({
       winnersLimit: "",
       prizes: [{ rank: 1, prize_amount: "" }],
       teamLimitPerUser: "",
-      
+
     });
   };
 
@@ -422,6 +428,7 @@ const CreateEventModal = ({
                     <span className={styles.error}>{errors.bowlerLimit}</span>
                   )}
                 </div>
+
                 <div
                   className={classNames(styles.formGroup, {
                     [styles.error]: errors.allRounderLimit,
@@ -442,7 +449,26 @@ const CreateEventModal = ({
                     </span>
                   )}
                 </div>
+
               </div>
+              <div
+                  className={classNames(styles.formGroup, {
+                    [styles.error]: errors.wicketkeeperLimit,
+                  })}
+                >
+                  <label htmlFor="wicketkeeperLimit">Wicket Keeper Limit</label>
+                  <input
+                    type="number"
+                    id="wicketkeeperLimit"
+                    name="wicketkeeperLimit"
+                    value={eventData.wicketkeeperLimit}
+                    onChange={handleChange}
+                    required
+                  />
+                  {errors.wicketkeeperLimit && (
+                    <span className={styles.error}>{errors.wicketkeeperLimit}</span>
+                  )}
+                </div>
               {errors.playerLimits && (
                 <div className={styles.error}>{errors.playerLimits}</div>
               )}

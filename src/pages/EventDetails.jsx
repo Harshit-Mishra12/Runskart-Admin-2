@@ -134,6 +134,11 @@ const EventDetails = () => {
       value: event?.batsman_limit?.toLocaleString(),
     },
     {
+      icon: <GiCricketBat className={styles.icon} />,
+      label: "Wicket Keeper Limit",
+      value: event?.wicketkeeper_limit?.toLocaleString(),
+    },
+    {
       icon: <BiCricketBall className={styles.icon} />,
       label: "Bowler Limit",
       value: event?.bowler_limit?.toLocaleString(),
