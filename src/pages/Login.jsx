@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
 import styles from "./Login.module.css";
 import CustomButton from "../components/common/CustomButton";
 import { useNavigate } from "react-router-dom";
-import { login } from '../redux/authReducer/action';
+import { login } from "../redux/authReducer/action";
 import Snackbar from "../components/common/Snackbar";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("Qwerty@gamil.com");
-  const [password, setPassword] = useState("Qwerty123");
+  const [email, setEmail] = useState("admin@gmail.com");
+  const [password, setPassword] = useState("1234567");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -42,7 +42,7 @@ const Login = () => {
       setSnackbarSeverity("success");
       setLoading(false);
       setIsLoading(false);
-      navigate('/');
+      navigate("/");
     }
   };
 
@@ -93,11 +93,13 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            {errors.password && <p className={styles.errorText}>{errors.password}</p>}
+            {errors.password && (
+              <p className={styles.errorText}>{errors.password}</p>
+            )}
           </div>
-          <CustomButton  isLoading={isLoading} type="primary" width="200px">
+          <CustomButton isLoading={isLoading} type="primary" width="200px">
             Login
-          </CustomButton >
+          </CustomButton>
         </form>
       </div>
     </div>

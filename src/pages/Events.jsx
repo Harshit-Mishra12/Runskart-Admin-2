@@ -9,11 +9,13 @@ import EventStatus from "../components/common/EventStatus";
 import { fetchevents } from "../redux/eventReducer/action";
 import { useDispatch, useSelector } from "react-redux";
 import TableSkeleton from "../components/common/TableSkeleton";
+import DummyTeamsButton from "../DummyTeams/DummyTeamsButton";
 
 const Events = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [date, setDate] = useState("");
+  const [enabledId, setEnabledId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setloading] = useState(false);
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
@@ -209,6 +211,22 @@ const Events = () => {
                         >
                           View
                         </CustomButton>
+                        {event.status === "UPCOMING" && (
+                          <DummyTeamsButton
+                            eventId={event.id}
+                            status={event.status}
+                            name={event.event_name}
+                            enabled={
+                              event.status === "UPCOMING" &&
+                              enabledId === event.id
+                            }
+                            setEnabledId={setEnabledId}
+                            seatLeft={
+                              event.user_participation_limit - event.occupancy
+                            }
+                            fetchEvents={fetchEvents}
+                          />
+                        )}
                       </div>
                     </td>
                   </tr>
