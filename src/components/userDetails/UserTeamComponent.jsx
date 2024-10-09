@@ -4,50 +4,38 @@ import CustomButton from "../common/CustomButton";
 import EventStatus from "../common/EventStatus";
 
 const UserTeamComponent = ({ teams }) => {
-  const renderPrize = (status, prize) => {
-    switch (status) {
-      case "Released":
-        return "N/A";
-      case "Live":
-        return "Pending";
-      case "Cancelled":
-        return "Cancelled";
-      case "Completed":
-        return prize;
-      default:
-        return "Unknown";
-    }
-  };
+  // const renderPrize = (status) => {
+  //   switch (status) {
+  //     case "active":
+  //       return "Pending";
+  //     case "completed":
+  //       return "Prize Released"; // Assuming prize info isn't in the team data; adjust if available.
+  //     default:
+  //       return "Unknown";
+  //   }
+  // };
 
-  const renderPoints = (status, points) => {
-    switch (status) {
-      case "Released":
-        return "N/A";
-      case "Live":
-        return "Pending";
-      case "Cancelled":
-        return "0";
-      case "Completed":
-        return points;
-      default:
-        return "Unknown";
-    }
-  };
+  // const renderPoints = (status, points) => {
+  //   switch (status) {
+  //     case "active":
+  //       return points || "0"; // Show points if available, or 0 as fallback
+  //     case "completed":
+  //       return points;
+  //     default:
+  //       return "Unknown";
+  //   }
+  // };
 
-  const renderRank = (status, rank) => {
-    switch (status) {
-      case "Released":
-        return "N/A";
-      case "Live":
-        return "Pending";
-      case "Cancelled":
-        return "N/A";
-      case "Completed":
-        return rank;
-      default:
-        return "Unknown";
-    }
-  };
+  // const renderRank = (status) => {
+  //   switch (status) {
+  //     case "active":
+  //       return "Pending";
+  //     case "completed":
+  //       return "Rank Available"; // Assuming rank is not part of the data you provided.
+  //     default:
+  //       return "Unknown";
+  //   }
+  // };
 
   return (
     <div className={styles.tableContainer}>
@@ -59,7 +47,7 @@ const UserTeamComponent = ({ teams }) => {
             <th>Team Name</th>
             <th>Owner</th>
             <th>Points</th>
-            <th>Prize</th>
+            {/* <th>Prize</th> */}
             <th>Entry Transaction</th>
             <th>Prize Transaction</th>
             <th>Event Status</th>
@@ -67,44 +55,31 @@ const UserTeamComponent = ({ teams }) => {
           </tr>
         </thead>
         <tbody>
-          {teams.map((team) => (
+        {teams.map(({ team, isMy }, index) => (
             <tr key={team.id}>
-              <td>{renderRank(team.eventStatus, team.rank)}</td>
-              <td>{team.date}</td>
-              <td>{team.teamName}</td>
-              <td>{team.owner}</td>
-              <td>{renderPoints(team.eventStatus, team.points)}</td>
-              <td>{renderPrize(team.eventStatus, team.prize)}</td>
+              <td>{team.rank}</td>
+              <td>{new Date(team.created_at).toLocaleDateString()}</td>
+              <td>{team.name}</td>
+              <td>{isMy ? "You" : team.user_name}</td>
+              <td>{team.points_scored}</td>
+              {/* <td>{team.status}</td> */}
               <td>
-                <span
-                  className={
-                    team.entryTransaction === "Completed"
-                      ? styles.completed
-                      : styles.pending
-                  }
-                >
-                  {team.entryTransaction}
+                <span className={styles.completed}>
+                  {"Pending"}
                 </span>
               </td>
               <td>
-                <span
-                  className={
-                    team.prizeTransaction === "Completed" ||
-                    team.prizeTransaction === "Refunded"
-                      ? styles.completed
-                      : styles.pending
-                  }
-                >
-                  {team.prizeTransaction}
+                <span className={styles.completed}>
+                  {"Pending"}
                 </span>
               </td>
               <td>
-                <EventStatus status={team.eventStatus} />
+                <EventStatus status={team.status} />
               </td>
               <td>
                 <CustomButton
                   type="secondary"
-                  onClick={() => console.log("View Results")}
+                  onClick={() => console.log(`View Results for Team ${team.id}`)}
                 >
                   View
                 </CustomButton>

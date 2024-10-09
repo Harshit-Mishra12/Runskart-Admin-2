@@ -6,7 +6,8 @@ const initialState = {
   matchesList:[],
   totalEvents: "",
   eventDetail:"",
-  playersList:[]
+  playersList:[],
+  eventTeamsList:[]
 
 };
 
@@ -37,6 +38,12 @@ const reducer = (state = initialState, action) => {
         return {
           ...state,
           playersList: action.payload,
+        };
+
+      case types.GET_EVENTTEAMLIST_SUCCESS:
+        return {
+          ...state,
+          eventTeamsList: action.payload,
         };
 
     default:

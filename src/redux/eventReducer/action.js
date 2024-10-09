@@ -263,3 +263,32 @@ try {
 }
 };
 
+
+export const fetcheventteamlist = (id,callback) => async (dispatch) => {
+  console.log("fetcheventdetail:");
+    const token = JSON.parse(localStorage.getItem('token'));
+    const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  try {
+    const response = await axios.get(`${API_URL}/user/events/all/team/${id}`, config);
+    console.log("check result fetcheventteamplayerlist:",response.data.teams);
+    if (response.data.status_code === 1 ) {
+
+      dispatch({ type: types.GET_EVENTTEAMLIST_SUCCESS ,payload:response.data.teams});
+
+      callback( { statusCode: 1, message: "success" });
+    }
+    else{
+      callback( { statusCode: 2, message: "fail" });
+      dispatch({ type: types.GET_EVENTTEAMLIST_SUCCESS ,payload:[]});
+    }
+    return { statusCode: 1, message: "success"};
+
+  } catch (error) {
+    console.error("dashboard error:", error);
+    return { statusCode: 2, message: error.message };
+  }
+};
