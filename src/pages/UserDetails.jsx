@@ -20,17 +20,18 @@ import {
 } from "react-icons/fa";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { userTeams } from "../utils/tempData";
-import { changestatus, fetchuserdetail, verifyuser } from "../redux/userReducer/action";
+import { changestatus, fetchuserdetail, fetchuserteamlist, verifyuser } from "../redux/userReducer/action";
 import Skeleton from "../components/common/Skeleton";
 
 const UserDetails = () => {
   const { id } = useParams();
 
   const dispatch = useDispatch();
-  const { userDetail } = useSelector((store) => store.users);
+  const { userDetail,userTeamList } = useSelector((store) => store.users);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("teams");
   const [loading, setLoading] = useState(false);
+  const [userTeamListData, setUserTeamListData] = useState([]);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
   const [currentDocument, setCurrentDocument] = useState(null);
   const { user, bank_details, documents } = userDetail || {};
@@ -39,7 +40,13 @@ const UserDetails = () => {
 
     setLoading(true);
     dispatch(fetchuserdetail(id, callbackAfter));
+    dispatch(fetchuserteamlist(id, callbackAfter));
+
   }, [dispatch]);
+  useEffect(() => {
+    setUserTeamListData(userTeamList);
+  }, [userTeamList])
+
 
   const handleDownloadReport = () => {
     console.log("Downloading player report...");
@@ -247,7 +254,7 @@ const UserDetails = () => {
           </button>
         </div>
         <div className={styles.tabContent}>
-          {activeTab === "teams" && <UserTeamComponent teams={userTeams} />}
+          {activeTab === "teams" && <UserTeamComponent teams={userTeamListData} />}
         </div>
       </div>
 

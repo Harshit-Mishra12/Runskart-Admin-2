@@ -27,6 +27,7 @@ import {
   changestatus,
   eventdelete,
   fetcheventdetail,
+  fetcheventteamlist
 } from "../redux/eventReducer/action";
 import Skeleton from "../components/common/Skeleton";
 import ResultsComponent from "../components/eventDetails/ResultsComponent";
@@ -34,13 +35,15 @@ import EditEventModal from "../components/models/EditEventModal";
 
 const EventDetails = () => {
   const dispatch = useDispatch();
-  const { eventDetail } = useSelector((store) => store.events);
+  const { eventDetail,eventTeamsList } = useSelector((store) => store.events);
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("matches");
+  const [eventTeamsData, setEventTeamsData] = useState([]);
   const [statusChanged, setStatusChanged] = useState(false);
   const [loading, setLoading] = useState(false);
   const callback = (result) => {
+
     if (result.statusCode === 1) {
       setLoading(false);
     }
@@ -48,7 +51,13 @@ const EventDetails = () => {
   useEffect(() => {
     setLoading(true);
     dispatch(fetcheventdetail(id, callback)); // Fetch event detail
+    dispatch(fetcheventteamlist(id, callback)); // Fetch event detail
+
   }, [dispatch, id]);
+  useEffect(() => {
+    setEventTeamsData(eventTeamsList)
+  }, [eventTeamsList]);
+
 
   const { event, prizes, matches, occupancy } = eventDetail || {};
   const userParticipationLimit = event?.user_participation_limit ?? 0;
@@ -340,7 +349,8 @@ const EventDetails = () => {
             {activeTab === "matches" && <MatchesComponent matches={matches} />}
             {activeTab === "teams" && (
               <UserTeamComponent
-                teams={generateRandomTeams(50, event.status)}
+                teams={eventTeamsData}
+                // teams={generateRandomTeams(50, event.status)}
               />
             )}
             {activeTab === "results" && (
