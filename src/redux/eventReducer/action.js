@@ -292,3 +292,34 @@ export const fetcheventteamlist = (id,callback) => async (dispatch) => {
     return { statusCode: 2, message: error.message };
   }
 };
+
+export const fetchDownloadCsv = (id, callback) => async (dispatch) => {
+  console.log("Fetching event detail:");
+  const token = JSON.parse(localStorage.getItem('token'));
+  const config = {
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+      responseType: 'blob', // Important for handling binary data (CSV)
+  };
+
+  try {
+      const response = await axios.get(`${API_URL}/admin/teams/export/${id}`, config);
+
+      // Create a URL for the file and trigger the download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'teams_export.csv'); // Set the desired file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Call the callback with success
+      callback({ statusCode: 1, message: "Download initiated successfully" });
+
+  } catch (error) {
+      console.error("Download error:", error);
+      callback({ statusCode: 2, message: error.message });
+  }
+};
