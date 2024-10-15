@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   changestatus,
   eventdelete,
+  fetchDownloadCsv,
   fetcheventdetail,
   fetcheventteamlist
 } from "../redux/eventReducer/action";
@@ -69,6 +70,18 @@ const EventDetails = () => {
     setLoading(true);
     dispatch(eventdelete(id, callback));
   };
+
+  const handleCsvDownload = () => {
+    dispatch(fetchDownloadCsv(id, (result) => {
+        if (result.statusCode === 1) {
+            console.log("Download initiated:", result.message);
+        } else {
+            console.error("Download failed:", result.message);
+        }
+    }));
+};
+
+
   const handleUpdateStatus = () => {
     setLoading(true);
     dispatch(changestatus(id, callback));
@@ -217,6 +230,9 @@ const EventDetails = () => {
           />
           <CustomButton type="outline" onClick={() => navigate("/events")}>
             Back to Events
+          </CustomButton>
+          <CustomButton type="outline" onClick={handleCsvDownload}>
+           Download Teams
           </CustomButton>
           {event?.status === "Created" && (
             <CreateEventModal edit={true} event={event} />
