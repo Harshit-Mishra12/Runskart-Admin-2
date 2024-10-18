@@ -57,9 +57,13 @@ const UserDetails = () => {
     dispatch(verifyuser(id, callbackAfter));
   };
 
-  const handleUpdateStatus = () => {
+  const handleUpdateStatus = (statusMessage) => {
     const callbackAfter = () => {};
-    dispatch(changestatus(id, callbackAfter));
+    const params={
+      user_id:id,
+      status_message:statusMessage
+    }
+    dispatch(changestatus(params, callbackAfter));
   };
 
   const handleViewDocument = (documentType, url) => {
@@ -121,7 +125,8 @@ const UserDetails = () => {
             <CustomButton
 
               type={user && user.status === "ACTIVE" ? "danger" : "warning"}
-              onClick={handleUpdateStatus}
+              // onClick={handleUpdateStatus}
+              onClick={(statusMessage) => handleUpdateStatus(statusMessage)}
               alert={true}
               alertMessage={
                 user && user.status === "ACTIVE"
