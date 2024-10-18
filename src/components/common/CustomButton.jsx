@@ -13,8 +13,11 @@ const CustomButton = ({
   height = "45px",
   alert = false,
   alertMessage = "Are you sure you want to proceed?",
+  showStatusInput = false,
 }) => {
   const [showAlert, setShowAlert] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+
 
   const buttonClass = `
     ${styles.button}
@@ -34,7 +37,7 @@ const CustomButton = ({
 
   const handleAlertAccept = () => {
     setShowAlert(false);
-    onClick();
+    onClick(statusMessage);
   };
 
   const handleAlertCancel = () => {
@@ -55,6 +58,14 @@ const CustomButton = ({
         <div className={styles.alertOverlay}>
           <div className={styles.alertBox}>
             <p>{alertMessage}</p>
+            <input
+                  type="text"
+                  id="statusMessage"
+                  value={statusMessage}
+                  onChange={(e) => setStatusMessage(e.target.value)}
+                  placeholder="Enter a status message"
+                  className={styles.statusInput}
+                />
             <div className={styles.alertButtons}>
               <button
                 className={styles.alertAccept}

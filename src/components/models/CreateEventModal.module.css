@@ -208,4 +208,13 @@
 }
 
 
+.totalPrizeAmount {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.totalPrizeAmount label {
+  margin-right: 10px;
+}
+
 

@@ -67,21 +67,59 @@ const EditEventModal = ({
       });
     }
   }, [edit, event, isOpen, otherPrizes]);
-
+  const totalPrizeAmount = eventData.prizes.reduce(
+    (sum, prize) => sum + (Number(prize.prize_amount) || 0),
+    0
+  );
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   console.log("onchange:", name, " ", value);
+  //   setEventData((prevData) => ({ ...prevData, [name]: value }));
+  // };
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log("onchange:", name, " ", value);
-    setEventData((prevData) => ({ ...prevData, [name]: value }));
+
+    // Allow only numbers for userParticipationLimit
+    if (
+      name === "userParticipationLimit" ||
+      name === "teamSizeLimit" ||
+      name === "teamLimitPerUser" ||
+      name === "batsmanLimit" ||
+      name === "bowlerLimit" ||
+      name === "allRounderLimit" ||
+      name === "teamCreationCost" ||
+      name === "winnersLimit" ||
+      name === "wicketkeeperLimit" ||
+      name === "otherPrizes"
+    ) {
+      // Check if the value is a valid number (including empty string)
+      if (value === "" || /^[0-9]*$/.test(value)) {
+        setEventData((prevData) => ({ ...prevData, [name]: value }));
+      } else {
+        // Optional: Log an error or reset the field if needed
+        console.error("Invalid input: Only numeric values are allowed.");
+      }
+    } else {
+      setEventData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const handleMatchesChange = (selectedMatches) => {
     setEventData((prevData) => ({ ...prevData, matches: selectedMatches }));
   };
 
+  // const handlePrizeChange = (index, field, value) => {
+  //   const updatedPrizes = [...eventData.prizes];
+  //   updatedPrizes[index][field] = value;
+  //   setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
+  // };
   const handlePrizeChange = (index, field, value) => {
-    const updatedPrizes = [...eventData.prizes];
-    updatedPrizes[index][field] = value;
-    setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
+    // Check if the value is a valid number (or allow empty values for clearing input)
+    if (!isNaN(value) || value === "") {
+      const updatedPrizes = [...eventData.prizes];
+      updatedPrizes[index][field] = value;
+      setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
+    }
   };
 
   const addPrize = () => {
@@ -516,6 +554,10 @@ const EditEventModal = ({
                   >
                     Remove
                   </CustomButton>
+                </div>
+                <div className={styles.totalPrizeAmount}>
+                  <label>Total Prize Amount: </label>
+                  <span>{totalPrizeAmount}</span>
                 </div>
               </div>
               <div className={styles.formGroup}>
