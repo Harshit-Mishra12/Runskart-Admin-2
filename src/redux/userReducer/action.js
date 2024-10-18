@@ -65,7 +65,7 @@ export const fetchuserdetail = (id, callback) => async (dispatch) => {
   }
 };
 
-export const verifyuser = (id, callback) => async (dispatch) => {
+export const changeverificationdocstatus = (params, callback) => async (dispatch) => {
   const token = JSON.parse(localStorage.getItem("token"));
   const config = {
     headers: {
@@ -73,14 +73,15 @@ export const verifyuser = (id, callback) => async (dispatch) => {
     },
   };
   try {
-    const response = await axios.get(
-      `${API_URL}/admin/users/verify/${id}`,
+    const response = await axios.post(
+      `${API_URL}/admin/users/changeverificationdocstatus`,
+      params,
       config
     );
 
     if (response.data.status_code === 1) {
       dispatch({ type: types.GET_VERIFY_SUCCESS, payload: response.data.data });
-      dispatch(fetchuserdetail(id, callback));
+      dispatch(fetchuserdetail(params.user_id, callback));
       callback({ statusCode: 1, message: "success" });
     } else {
       callback({ statusCode: 2, message: "fail" });

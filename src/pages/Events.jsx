@@ -20,6 +20,7 @@ const Events = () => {
   const [loading, setloading] = useState(false);
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
   const [clearButtonLoading, setClearButtonLoading] = useState(false);
+  const [sortOption, setSortOption] = useState('');
   const eventsPerPage = 5; // Set the number of events per page
   const { eventsList, totalEvents } = useSelector((store) => store.events); // Assume totalEvents is provided by the backend
 
@@ -32,12 +33,23 @@ const Events = () => {
       setClearButtonLoading(false);
     }
   };
+  useEffect(() => {
+    const params = {
+      per_page: eventsPerPage,
+      page: currentPage,
+      date: date || "",
+      go_live_date:sortOption
+    };
+    setloading(true);
+    dispatch(fetchevents(params, callbackAfterFetchSuccess));
+  }, [sortOption]);
 
   useEffect(() => {
     const params = {
       per_page: eventsPerPage,
       page: currentPage,
       date: date || "",
+      go_live_date:0
     };
     setloading(true);
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
@@ -51,6 +63,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: 1,
       date: date || "",
+      go_live_date:0
     };
 
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
@@ -65,6 +78,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: currentPage,
       date: date || "",
+      go_live_date:0
     };
     setDate("");
     setCurrentPage(1);
@@ -78,6 +92,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: 1,
       date: "",
+      go_live_date:0
     };
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
   };
@@ -99,6 +114,17 @@ const Events = () => {
     if (filled / total >= 0.7) return "info";
     if (filled / total >= 0.5) return "warning";
     return "danger";
+  };
+  const sortByGoLiveDate = (sortOption) => {
+    // Your sorting logic based on the selected option
+    console.log('Sorting by:', sortOption);
+  };
+
+  const handleSortChange = (event) => {
+    const selectedOption = event.target.value;
+    setSortOption(selectedOption);
+    // Call your sorting function here, for example:
+    sortByGoLiveDate(selectedOption);
   };
 
   return (
@@ -132,6 +158,20 @@ const Events = () => {
         >
           Clear
         </CustomButton>
+        {/* Dropdown for sorting by Go Live Date */}
+        <div className={styles.dropdownContainer}>
+          <label htmlFor="sortBy">Sort By:</label>
+          <select
+            id="sortBy"
+            value={sortOption}
+            onChange={handleSortChange}
+            className={styles.dropdown}
+          >
+            <option value="0">Select an option</option>
+            <option value="1">Nearest Go Live Date </option>
+
+          </select>
+        </div>
       </div>
       <div className={styles.statsBar}>
         <div className={styles.stat}>

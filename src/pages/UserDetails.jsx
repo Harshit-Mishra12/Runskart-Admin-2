@@ -20,7 +20,7 @@ import {
 } from "react-icons/fa";
 import UserTeamComponent from "../components/userDetails/UserTeamComponent";
 import { userTeams } from "../utils/tempData";
-import { changestatus, fetchuserdetail, fetchuserteamlist, verifyuser } from "../redux/userReducer/action";
+import { changestatus, fetchuserdetail, fetchuserteamlist, changeverificationdocstatus } from "../redux/userReducer/action";
 import Skeleton from "../components/common/Skeleton";
 
 const UserDetails = () => {
@@ -52,9 +52,13 @@ const UserDetails = () => {
     console.log("Downloading player report...");
   };
 
-  const handleVerify = () => {
+  const handleToggleVerify = (statusMessage) => {
     const callbackAfter = () => {};
-    dispatch(verifyuser(id, callbackAfter));
+    const params={
+      status_message:statusMessage,
+      user_id:id
+    }
+    dispatch(changeverificationdocstatus(params, callbackAfter));
   };
 
   const handleUpdateStatus = (statusMessage) => {
@@ -96,33 +100,33 @@ const UserDetails = () => {
 
           <div className={styles.statusButtons}>
             {
-             user && user.status === "VERIFICATIONPENDING" && (
+             user  && (user.doc_status == "VERIFIED" || user.doc_status == "PENDING" || user.doc_status == "UNVERIFIED")   &&  (
                 <CustomButton
-                type={user.status === "ACTIVE" ? "success" : "danger"}
-                onClick={handleVerify}
+                type={user.doc_status === "VERIFIED" ? "success" : "danger"}
+                // onClick={handleVerify}
+                onClick={(statusMessage) => handleToggleVerify(statusMessage)}
                 alert={true}
                 alertMessage={
-                  user && user.verified
-                    ? "Are you sure you want to unverify this user?"
-                    : "Are you sure you want to verify this user?"
+                 "Are you sure you want to unverify this user"
                 }
               >
-                {user && user.status === "ACTIVE" ? (
+                {user && user.doc_status === "VERIFIED" ? (
                   <>
                     <FaCheckCircle />
-                    <span style={{ marginLeft: "0.5rem" }}>Verified</span>
+                    <span style={{ marginLeft: "0.5rem" }}>Verified Doc</span>
                   </>
                 ) : (
                   <>
                     <FaTimesCircle />
-                    <span style={{ marginLeft: "0.5rem" }}>Unverified</span>
+                    <span style={{ marginLeft: "0.5rem" }}>Unverified Doc</span>
                   </>
                 )}
               </CustomButton>
               )
             }
-
-            <CustomButton
+             {
+               user  &&   (
+                <CustomButton
 
               type={user && user.status === "ACTIVE" ? "danger" : "warning"}
               // onClick={handleUpdateStatus}
@@ -146,6 +150,9 @@ const UserDetails = () => {
                 </>
               )}
             </CustomButton>
+               )
+             }
+
           </div>
         </div>
       </div>
