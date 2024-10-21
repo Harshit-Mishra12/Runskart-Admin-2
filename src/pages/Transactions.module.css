@@ -117,6 +117,16 @@
   color: #ffc107;
   font-weight: bold;
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+
+}
+.space{
+  margin-left: 10px;
+}
 
 @media (max-width: 768px) {
   .transactionsContainer {

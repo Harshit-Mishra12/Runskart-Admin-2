@@ -13,6 +13,7 @@ import { reducer as dashboardReducer } from "./dashboardReducer/reducer";
 import { reducer as eventReducer } from "./eventReducer/reducer";
 import { reducer as userReducer } from "./userReducer/reducer";
 import { reducer as faqReducer } from "./faqReducer/reducer";
+import { reducer as transactionReducer } from "./transactionReducer/reducer";
 // Correct the typo in Redux DevTools extension compose function
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -21,7 +22,8 @@ const rootReducer = combineReducers({
   dashboards: dashboardReducer,
   events: eventReducer,
   users: userReducer,
-  faqs:faqReducer
+  faqs:faqReducer,
+  transactions:transactionReducer
 });
 
 export const store = legacy_createStore(
