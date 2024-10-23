@@ -164,13 +164,22 @@ const EditEventModal = ({
       newErrors.wicketkeeperLimit =
         "wicket keeper Limit must be greater than 0";
 
+    // const totalPlayerLimit =
+    //   parseInt(eventData.batsmanLimit, 10) +
+    //   parseInt(eventData.bowlerLimit, 10) +
+    //   parseInt(eventData.allRounderLimit, 10);
+    // if (totalPlayerLimit > eventData.teamSizeLimit) {
+    //   newErrors.playerLimits =
+    //     "The sum of Batsman Limit, Bowler Limit, and All-Rounder Limit cannot be greater than Team Size Limit";
+    // }
     const totalPlayerLimit =
       parseInt(eventData.batsmanLimit, 10) +
       parseInt(eventData.bowlerLimit, 10) +
-      parseInt(eventData.allRounderLimit, 10);
-    if (totalPlayerLimit > eventData.teamSizeLimit) {
-      newErrors.playerLimits =
-        "The sum of Batsman Limit, Bowler Limit, and All-Rounder Limit cannot be greater than Team Size Limit";
+      parseInt(eventData.allRounderLimit, 10) +
+      parseInt(eventData.wicketkeeperLimit, 10); // Correctly include the wicketkeeper limit
+
+    if (totalPlayerLimit < eventData.teamSizeLimit) {
+      newErrors.playerLimits = `The sum of Batsman Limit, Bowler Limit, All-Rounder Limit, and Wicketkeeper Limit (${totalPlayerLimit}) should be greater than or equal to the Team Size Limit (${eventData.teamSizeLimit}).`;
     }
     if (eventData.teamLimitPerUser < 1)
       newErrors.teamLimitPerUser = "Team Limit Per User must be greater than 0";
