@@ -70,7 +70,7 @@ const Dashboard = () => {
             }
           />
         )}
-        {loading ? (
+        {/* {loading ? (
           <Skeleton />
         ) : (
           <Card
@@ -83,7 +83,7 @@ const Dashboard = () => {
               dashboardData?.latest_winner?.event || "No event available"
             }`}
           />
-        )}
+        )} */}
         {loading ? (
           <Skeleton />
         ) : (
@@ -94,7 +94,7 @@ const Dashboard = () => {
             subtitle="Total Users"
           />
         )}
-        {loading ? (
+        {/* {loading ? (
           <Skeleton />
         ) : (
           <Card
@@ -113,7 +113,7 @@ const Dashboard = () => {
               </select>
             }
           />
-        )}
+        )} */}
         {loading ? (
           <Skeleton />
         ) : (
