@@ -154,6 +154,9 @@ const Transactions = () => {
               <th>User Name</th>
               <th>Type</th>
               <th>Transaction Usecase</th>
+              <th>Account no</th>
+              <th>Account Name</th>
+              <th>IFSC Code</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -177,6 +180,9 @@ const Transactions = () => {
                   </span>
                 </td>
                 <td>{transaction.transaction_usecase}</td>
+                <td>{transaction.bank_details.account_name}</td>
+                <td>{transaction.bank_details.account_number}</td>
+                <td>{transaction.bank_details.ifsc_code}</td>
                 <td>
                   <span
                     className={
