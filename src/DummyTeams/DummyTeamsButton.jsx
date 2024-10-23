@@ -163,7 +163,7 @@ const DummyTeamsButton = ({
           marginTop: "2px",
         }}
       >
-        <CustomButton
+        {/* <CustomButton
           onClick={openPopup}
           type="primary"
           size="small"
@@ -171,7 +171,7 @@ const DummyTeamsButton = ({
           disabled={status !== "UPCOMING"}
         >
           Fill Teams
-        </CustomButton>
+        </CustomButton> */}
       </div>
 
       {isPopupOpen && (
