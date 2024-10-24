@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./CreateEventModal.module.css";
 import CustomButton from "../common/CustomButton";
-import { tempMatches } from "../../utils/tempData";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { createevent, fetchmatches } from "../../redux/eventReducer/action";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +25,7 @@ const CreateEventModal = ({
   const [formLoading, setFormLoading] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
   const [snackbarSeverity, setSnackbarSeverity] = useState(null);
+  const [totalPrizeAmount, setTotalPrizeAmount] = useState(0);
   const [eventData, setEventData] = useState({
     name: "",
     goLiveDate: "",
@@ -78,14 +78,7 @@ const CreateEventModal = ({
 
     if (!eventData.allRounderLimit || eventData.allRounderLimit <= 0)
       newErrors.allRounderLimit = "All-Rounder Limit must be greater than 0";
-    // const totalPlayerLimit =
-    //   parseInt(eventData.batsmanLimit, 10) +
-    //   parseInt(eventData.bowlerLimit, 10) +
-    //   parseInt(eventData.allRounderLimit, 10)+ parseInt(eventData.allRounderLimit, 10);
-    // if (totalPlayerLimit >= eventData.teamSizeLimit) {
-    //   newErrors.playerLimits =
-    //     "The sum of Batsman Limit, Bowler Limit, and All-Rounder and wickkkper Limit should be greater than Team Size Limit";
-    // }
+
     const totalPlayerLimit =
       parseInt(eventData.batsmanLimit, 10) +
       parseInt(eventData.bowlerLimit, 10) +
@@ -131,12 +124,37 @@ const CreateEventModal = ({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // Calculate total prize amount
-  const totalPrizeAmount = eventData.prizes.reduce(
+  const totalPrizeAmountfunc = eventData.prizes.reduce(
     (sum, prize) => sum + (Number(prize.prize_amount) || 0),
     0
   );
+  const calculateTotalPrizeAmount = () => {
+    // Default values for otherPrizes and winnersLimit
+    const otherPrizes = (
+      eventData.otherPrizes &&
+      eventData.winnersLimit &&
+      (eventData.winnersLimit > 0) &&
+      (eventData.prizes.length < eventData.winnersLimit)
+  )
+      ? eventData.otherPrizes * (eventData.winnersLimit - eventData.prizes.length)
+      : 0;
+
+    // Calculate total prize amount
+    const totalAmount = totalPrizeAmountfunc + otherPrizes; // Add to the current totalPrizeAmount
+
+    console.log("Check calculation of total prize amount:", totalPrizeAmountfunc," ",otherPrizes);
+    return totalAmount;
+};
+
+
+// Effect to calculate total prize amount when component is rendered or updated
+useEffect(() => {
+    const totalAmount = calculateTotalPrizeAmount();
+    setTotalPrizeAmount(totalAmount);
+}, [eventData]);
+
+  // Calculate total prize amount
+
   useEffect(() => {
     const callbackFunction = (result) => {
       if (result.statusCode == 1) {
@@ -196,11 +214,7 @@ const CreateEventModal = ({
     setEventData((prevData) => ({ ...prevData, matches: selectedMatches }));
   };
 
-  // const handlePrizeChange = (index, field, value) => {
-  //   const updatedPrizes = [...eventData.prizes];
-  //   updatedPrizes[index][field] = value;
-  //   setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
-  // };
+
   const handlePrizeChange = (index, field, value) => {
     // Check if the value is a valid number (or allow empty values for clearing input)
     if (!isNaN(value) || value === "") {
@@ -209,24 +223,6 @@ const CreateEventModal = ({
       setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
     }
   };
-
-  // const handlePrizeChange = (index, field, value) => {
-  //   const updatedPrizes = [...eventData.prizes];
-
-  //   // Allow only numeric values for specific fields
-  //   if (field === "prizeAmount" || field === "someOtherNumericField") {
-  //     if (value === "" || /^[0-9]*$/.test(value)) {
-  //       updatedPrizes[index][field] = value;
-  //     } else {
-  //       console.error("Invalid input: Only numeric values are allowed.");
-  //       return; // Skip the update if it's an invalid value
-  //     }
-  //   } else {
-  //     updatedPrizes[index][field] = value; // For non-numeric fields
-  //   }
-
-  //   setEventData((prevData) => ({ ...prevData, prizes: updatedPrizes }));
-  // };
 
   const addPrize = () => {
     setEventData((prevData) => ({
@@ -629,11 +625,7 @@ const CreateEventModal = ({
                     Remove
                   </CustomButton>
                 </div>
-                {/* Display total prize amount */}
-                <div className={styles.totalPrizeAmount}>
-                  <label>Total Prize Amount: </label>
-                  <span>{totalPrizeAmount}</span>
-                </div>
+
               </div>
               <div
                 className={classNames(styles.formGroup, {
@@ -651,6 +643,11 @@ const CreateEventModal = ({
                   <span className={styles.error}>{errors.otherPrizes}</span>
                 )}
               </div>
+                {/* Display total prize amount */}
+                <div className={styles.totalPrizeAmount}>
+                  <label>Total Prize Amount: </label>
+                  <span>{totalPrizeAmount}</span>
+                </div>
               <div className={styles.buttonGroup}>
                 <CustomButton type="secondary" onClick={onClose}>
                   Cancel
