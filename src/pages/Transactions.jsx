@@ -118,7 +118,7 @@ const Transactions = () => {
   return (
     <div className={styles.transactionsContainer}>
       <div className={styles.header}>
-        <h1>Transactions</h1>
+        {/* <h1>Transactions</h1> */}
         <div className={styles.controls}>
           <input
             type="text"
