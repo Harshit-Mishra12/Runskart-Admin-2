@@ -28,6 +28,7 @@ import {
   eventdelete,
   fetchDownloadCsv,
   fetcheventdetail,
+  fetcheventteamprizelist,
   fetcheventteamlist
 } from "../redux/eventReducer/action";
 import Skeleton from "../components/common/Skeleton";
@@ -36,11 +37,12 @@ import EditEventModal from "../components/models/EditEventModal";
 
 const EventDetails = () => {
   const dispatch = useDispatch();
-  const { eventDetail,eventTeamsList } = useSelector((store) => store.events);
+  const { eventDetail,eventTeamsList,eventTeamsPrizeList } = useSelector((store) => store.events);
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("matches");
   const [eventTeamsData, setEventTeamsData] = useState([]);
+  const [eventTeamsPrizeData, setEventTeamsPrizeData] = useState([]);
   const [statusChanged, setStatusChanged] = useState(false);
   const [loading, setLoading] = useState(false);
   const callback = (result) => {
@@ -53,11 +55,13 @@ const EventDetails = () => {
     setLoading(true);
     dispatch(fetcheventdetail(id, callback)); // Fetch event detail
     dispatch(fetcheventteamlist(id, callback)); // Fetch event detail
+    dispatch(fetcheventteamprizelist(id, callback));
 
   }, [dispatch, id]);
   useEffect(() => {
-    setEventTeamsData(eventTeamsList)
-  }, [eventTeamsList]);
+    setEventTeamsData(eventTeamsList);
+    setEventTeamsPrizeData(eventTeamsPrizeList);
+  }, [eventTeamsList,eventTeamsPrizeList]);
 
 
   const { event, prizes, matches, occupancy } = eventDetail || {};
@@ -370,7 +374,11 @@ const EventDetails = () => {
               />
             )}
             {activeTab === "results" && (
-              <ResultsComponent teams={generateRandomTeams(50, event.status)} />
+              <ResultsComponent
+              //  teams={generateRandomTeams(50, event.status)}
+              teams={eventTeamsPrizeData}
+
+               />
             )}
           </div>
         </div>
