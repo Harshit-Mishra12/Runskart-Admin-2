@@ -1,5 +1,5 @@
 .tableContainer {
-  margin-top: 2rem;
+  margin-top: 0.1rem;
   overflow-x: auto;
 }
 
@@ -15,7 +15,7 @@
 
 .table th,
 .table td {
-  padding: 1rem;
+  padding: 0rem;
   text-align: left;
   border-bottom: 1px solid #e0e0e0;
 }
