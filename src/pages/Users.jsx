@@ -81,7 +81,7 @@ const Users = () => {
     <div className={styles.usersContainer}>
       <div className={styles.header}>
         {/* <h1>Users</h1> */}
-        <div className={styles.searchBar}>
+        {/* <div className={styles.searchBar}>
           <input
             type="text"
             placeholder="Search users..."
@@ -89,7 +89,7 @@ const Users = () => {
             onChange={handleSearch}
             className={styles.searchInput}
           />
-        </div>
+        </div> */}
       </div>
       <div className={styles.statsBar}>
         <div className={styles.stat}>
@@ -103,6 +103,15 @@ const Users = () => {
         <div className={styles.stat}>
           <span className={styles.statValue}>{totalUnVerifiedUser}</span>
           <span className={styles.statLabel}>Unverified Users</span>
+        </div>
+        <div className={styles.searchBar}>
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className={styles.searchInput}
+          />
         </div>
       </div>
       <div className={styles.tableWrapper}>

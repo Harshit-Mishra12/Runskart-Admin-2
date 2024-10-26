@@ -123,7 +123,7 @@ const FAQ = () => {
   return (
     <div className={styles.faqContainer}>
       <div className={styles.header}>
-        <h1>Frequently Asked Questions</h1>
+        {/* <h1>Frequently Asked Questions</h1> */}
         <CustomButton type="primary" onClick={() => setShowCreateModal(true)}>
           Create FAQ
         </CustomButton>
