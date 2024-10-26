@@ -80,7 +80,7 @@ const Users = () => {
   return (
     <div className={styles.usersContainer}>
       <div className={styles.header}>
-        <h1>Users</h1>
+        {/* <h1>Users</h1> */}
         <div className={styles.searchBar}>
           <input
             type="text"

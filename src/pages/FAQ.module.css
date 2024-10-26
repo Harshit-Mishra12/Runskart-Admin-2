@@ -67,10 +67,12 @@
   background-color: #f1f3f5;
   font-weight: bold;
   color: #495057;
+  font-size: 0.8rem;
 }
 
 .faqTable tbody tr {
   transition: background-color 0.3s;
+  font-size: 0.8rem;
 }
 
 .faqTable tbody tr:nth-child(even) {
