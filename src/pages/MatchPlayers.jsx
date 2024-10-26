@@ -90,17 +90,21 @@ const MatchPlayers = () => {
           onClose={() => setSnackbarMessage(null)}
         />
       )}
-      <div className={styles.header}>
+      {/* <div className={styles.header}>
         <h1>Match Players</h1>
         <CustomButton type="primary" onClick={handleSubmit}>
           Submit
         </CustomButton>
-      </div>
+      </div> */}
       <div className={styles.statsBar}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{playersListData.length}</span>
           <span className={styles.statLabel}>Total Players</span>
         </div>
+        <h5>Match Players</h5>
+        <CustomButton type="primary" onClick={handleSubmit}>
+          Submit
+        </CustomButton>
       </div>
 
       <div className={styles.tableWrapper}>
