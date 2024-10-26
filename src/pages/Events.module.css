@@ -13,7 +13,7 @@
 }
 
 .header h1 {
-  font-size: 2.5rem;
+ font-size: 1rem;;
   color: #343a40;
 }
 
@@ -33,7 +33,7 @@
 
 .statValue {
   display: block;
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: bold;
   color: #007bff;
 }
@@ -94,6 +94,11 @@
   padding: 1rem;
   text-align: left;
 }
+.eventsTable tr{
+  font-size: 0.8rem;
+
+}
+
 
 .eventsTable th {
   background-color: #f1f3f5;
@@ -103,6 +108,7 @@
 
 .eventsTable tbody tr {
   transition: background-color 0.3s;
+
 }
 
 .eventsTable tbody tr:nth-child(even) {
@@ -165,7 +171,7 @@
   border: 1px solid #ccc; /* Light border around the dropdown */
   border-radius: 4px; /* Rounded corners */
   background-color: #fff; /* White background for the dropdown */
-  font-size: 14px; /* Font size for the dropdown */
+  font-size: 1rem; /* Font size for the dropdown */
   margin-left: 5px; /* Space between label and dropdown */
   cursor: pointer; /* Change cursor to pointer when hovering */
   transition: border-color 0.2s; /* Smooth transition for border color */
