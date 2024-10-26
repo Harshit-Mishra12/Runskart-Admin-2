@@ -19,8 +19,9 @@
 
 .statsBar {
   display: flex;
-  justify-content: flex-start;
+  justify-content:space-between;
   margin-bottom: 2rem;
+  align-items: center;
   background-color: #ffffff;
   padding: 1rem;
   border-radius: 10px;
@@ -29,6 +30,9 @@
 
 .stat {
   text-align: center;
+}
+.actionsection{
+
 }
 
 .statValue {

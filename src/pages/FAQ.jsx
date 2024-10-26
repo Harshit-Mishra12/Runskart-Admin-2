@@ -124,15 +124,19 @@ const FAQ = () => {
     <div className={styles.faqContainer}>
       <div className={styles.header}>
         {/* <h1>Frequently Asked Questions</h1> */}
-        <CustomButton type="primary" onClick={() => setShowCreateModal(true)}>
-          Create FAQ
-        </CustomButton>
+
       </div>
       <div className={styles.statsBar}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{faqData.length}</span>
           <span className={styles.statLabel}>Total FAQs</span>
         </div>
+        <div className={styles.actionsection}>
+        <CustomButton type="primary" onClick={() => setShowCreateModal(true)}>
+          Create FAQ
+        </CustomButton>
+        </div>
+
       </div>
 
       <div className={styles.tableWrapper}>
