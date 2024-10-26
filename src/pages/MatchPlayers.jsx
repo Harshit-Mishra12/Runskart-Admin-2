@@ -96,16 +96,7 @@ const MatchPlayers = () => {
           Submit
         </CustomButton>
       </div> */}
-      <div className={styles.statsBar}>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{playersListData.length}</span>
-          <span className={styles.statLabel}>Total Players</span>
-        </div>
-        <h5>Match Players</h5>
-        <CustomButton type="primary" onClick={handleSubmit}>
-          Submit
-        </CustomButton>
-      </div>
+
 
       <div className={styles.tableWrapper}>
         {loading ? (
@@ -118,6 +109,16 @@ const MatchPlayers = () => {
             onPlayersStatusChange={handlePlayersStatusChange} // Handle status change
           />
         )}
+      </div>
+      <div className={styles.statsBar}>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>{playersListData.length}</span>
+          <span className={styles.statLabel}>Total Players</span>
+        </div>
+        <h5>Match Players</h5>
+        <CustomButton type="primary" onClick={handleSubmit}>
+          Submit
+        </CustomButton>
       </div>
     </div>
   );
