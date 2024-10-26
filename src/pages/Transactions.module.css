@@ -83,11 +83,13 @@
 .transactionsTable th {
   background-color: #f1f3f5;
   font-weight: bold;
+  font-size: 0.8rem;
   color: #495057;
 }
 
 .transactionsTable tbody tr {
   transition: background-color 0.3s;
+  font-size: 0.8rem;
 }
 
 .transactionsTable tbody tr:nth-child(even) {

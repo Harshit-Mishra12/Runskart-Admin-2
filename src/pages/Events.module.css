@@ -94,20 +94,18 @@
   padding: 1rem;
   text-align: left;
 }
-.eventsTable tr{
-  font-size: 0.8rem;
-
-}
 
 
 .eventsTable th {
   background-color: #f1f3f5;
   font-weight: bold;
   color: #495057;
+  font-size: 0.8rem;
 }
 
 .eventsTable tbody tr {
   transition: background-color 0.3s;
+  font-size: 0.8rem;
 
 }
 
