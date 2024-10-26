@@ -129,11 +129,12 @@ const Events = () => {
 
   return (
     <div className={styles.eventsContainer}>
-      <div className={styles.header}>
+      {/* <div className={styles.header}>
         <h1>Events</h1>
         <CreateEventModal eventFormCreated={eventFormCreated} />
-      </div>
-      <div className={styles.tableControls}>
+      </div> */}
+      <div className={styles.tableControlscontainer}>
+        <div className={styles.tableControls}>
         <input
           type="date"
           value={date}
@@ -172,8 +173,22 @@ const Events = () => {
 
           </select>
         </div>
+        </div>
+        <div className={styles.tableControlsend}>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>{totalEvents}</span>
+          <span className={styles.statLabel}>Total Events</span>
+
+        </div>
+        <div>
+        <CreateEventModal eventFormCreated={eventFormCreated} />
+        </div>
+
+        </div>
+
+
       </div>
-      <div className={styles.statsBar}>
+      {/* <div className={styles.statsBar}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{totalEvents}</span>
           <span className={styles.statLabel}>Total Events</span>
@@ -186,7 +201,7 @@ const Events = () => {
           <span className={styles.statValue}>0</span>
           <span className={styles.statLabel}>Total Teams Allocated</span>
         </div>
-      </div>
+      </div> */}
       <div className={styles.tableWrapper}>
         {loading ? (
           <TableSkeleton /> // Display skeleton when loading
