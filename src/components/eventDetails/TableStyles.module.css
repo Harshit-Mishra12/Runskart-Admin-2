@@ -1,5 +1,5 @@
 .tableContainer {
-  margin-top: 0.1rem;
+  margin-top: 1rem;
   overflow-x: auto;
 }
 
@@ -15,17 +15,15 @@
 
 .table th,
 .table td {
-  padding: 0rem;
+  padding: 0.2rem;
   text-align: left;
   border-bottom: 1px solid #e0e0e0;
-  font-size: 0.6rem;
 }
 
 .table th {
   background-color: #f5f5f5;
   font-weight: bold;
   color: #333;
-  font-size: 0.5rem;
 }
 
 .table tr:last-child td {
