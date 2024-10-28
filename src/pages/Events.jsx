@@ -20,7 +20,7 @@ const Events = () => {
   const [loading, setloading] = useState(false);
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
   const [clearButtonLoading, setClearButtonLoading] = useState(false);
-  const [sortOption, setSortOption] = useState('');
+  const [sortOption, setSortOption] = useState(0);
   const eventsPerPage = 5; // Set the number of events per page
   const { eventsList, totalEvents } = useSelector((store) => store.events); // Assume totalEvents is provided by the backend
 
@@ -49,7 +49,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: currentPage,
       date: date || "",
-      go_live_date:0
+      go_live_date:sortOption
     };
     setloading(true);
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
@@ -63,7 +63,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: 1,
       date: date || "",
-      go_live_date:0
+      go_live_date:sortOption
     };
 
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
@@ -78,7 +78,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: currentPage,
       date: date || "",
-      go_live_date:0
+      go_live_date:sortOption
     };
     setDate("");
     setCurrentPage(1);
@@ -92,7 +92,7 @@ const Events = () => {
       per_page: eventsPerPage,
       page: 1,
       date: "",
-      go_live_date:0
+      go_live_date:sortOption
     };
     dispatch(fetchevents(params, callbackAfterFetchSuccess));
   };

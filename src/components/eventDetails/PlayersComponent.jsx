@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "./TableStyles.module.css";
+import styles from "./PlayersStyles.module.css";
 
 const PlayersComponent = ({ playersListData, onPlayersStatusChange ,setUpdatedPlayers,updatedPlayers}) => {
   // Initialize players and updatedPlayers arrays
