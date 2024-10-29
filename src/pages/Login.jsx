@@ -51,7 +51,9 @@ const Login = () => {
     e.preventDefault();
     const newErrors = validateForm();
     if (Object.keys(newErrors).length === 0) {
-      const formData = { email, password };
+      const formData =
+       { email_or_mobile:email,
+         password:password };
       dispatch(login(formData, callbackAfterLoginSuccess));
     } else {
       setErrors(newErrors);
