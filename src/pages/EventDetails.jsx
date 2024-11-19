@@ -34,6 +34,7 @@ import {
 import Skeleton from "../components/common/Skeleton";
 import ResultsComponent from "../components/eventDetails/ResultsComponent";
 import EditEventModal from "../components/models/EditEventModal";
+import Snackbar from "../components/common/Snackbar";
 
 const EventDetails = () => {
   const dispatch = useDispatch();
@@ -45,6 +46,8 @@ const EventDetails = () => {
   const [eventTeamsPrizeData, setEventTeamsPrizeData] = useState([]);
   const [statusChanged, setStatusChanged] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [snackbarSeverity, setSnackbarSeverity] = useState(null);
   const callback = (result) => {
 
     if (result.statusCode === 1) {
@@ -86,9 +89,21 @@ const EventDetails = () => {
 };
 
 
+const callbackUpdateStatus = (result) => {
+
+  if (result.statusCode === 1) {
+    setLoading(false);
+  }
+  else if(result.statusCode === 2){
+    setSnackbarMessage(result.message);
+    setSnackbarSeverity("error");
+    setLoading(false);
+  }
+};
+
   const handleUpdateStatus = () => {
     setLoading(true);
-    dispatch(changestatus(id, callback));
+    dispatch(changestatus(id, callbackUpdateStatus));
     setStatusChanged(true);
   };
 
@@ -185,6 +200,13 @@ const EventDetails = () => {
   const adjustedOccupancyPercentage = Math.max(occupancyPercentage, 1);
   return (
     <div className={styles.eventDetailsContainer}>
+        {snackbarMessage && (
+        <Snackbar
+          message={snackbarMessage}
+          severity={snackbarSeverity}
+          onClose={() => setSnackbarMessage(null)}
+        />
+      )}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1>{event?.name}</h1>

@@ -196,7 +196,7 @@ try {
     callback( { statusCode: 1, message: "success" });
   }
   else{
-    callback( { statusCode: 2, message: "fail" });
+    callback( { statusCode: 2, message:response.data.message });
   }
   return { statusCode: 1, message: "success"};
 
