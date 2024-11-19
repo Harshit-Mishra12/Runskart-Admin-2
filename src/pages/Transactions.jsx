@@ -39,17 +39,27 @@ const Transactions = () => {
     dispatch(fetchtransactionlist(params, callbackAfterFetchSuccess));
   }, [dispatch, currentPage, dateFilter, searchTerm]);
 
+  // useEffect(() => {
+  //   const updatedTransactions = transactions.filter(
+  //     (transaction) =>
+  //       (transaction.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //         (transaction.transaction_id
+  //           ? transaction.transaction_id.toLowerCase().includes(searchTerm.toLowerCase())
+  //           : false)) &&
+  //       (dateFilter === "" || transaction.created_at.slice(0, 10) === dateFilter)
+  //   );
+  //   setFilteredTransactions(updatedTransactions);
+  // }, [transactions, searchTerm, dateFilter]);
   useEffect(() => {
-    const updatedTransactions = transactions.filter(
-      (transaction) =>
-        (transaction.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (transaction.transaction_id
-            ? transaction.transaction_id.toLowerCase().includes(searchTerm.toLowerCase())
-            : false)) &&
-        (dateFilter === "" || transaction.created_at.slice(0, 10) === dateFilter)
+    const updatedTransactions = transactions.filter((transaction) =>
+      ((transaction.user_name && transaction.user_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (transaction.transaction_id && transaction.transaction_id.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+      (dateFilter === "" || transaction.created_at.slice(0, 10) === dateFilter)
     );
+
     setFilteredTransactions(updatedTransactions);
   }, [transactions, searchTerm, dateFilter]);
+
 
   const handleSearch = (event) => {
     const value = event.target.value;
