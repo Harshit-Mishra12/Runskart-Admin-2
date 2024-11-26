@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styles from "./PlayersStyles.module.css";
 
-const PlayersComponent = ({ playersListData, onPlayersStatusChange ,setUpdatedPlayers,updatedPlayers}) => {
+const PlayersComponent = ({ playersListData, onPlayersStatusChange, setUpdatedPlayers, updatedPlayers }) => {
   // Initialize players and updatedPlayers arrays
   const [players, setPlayers] = useState(playersListData);
-
 
   // Handle the toggle of playing status
   const handleToggleStatus = (index) => {
@@ -18,7 +17,7 @@ const PlayersComponent = ({ playersListData, onPlayersStatusChange ,setUpdatedPl
 
         // Add or update the player in the updatedPlayers array
         let updatedArray = [...updatedPlayers];
-        const playerIndex = updatedArray.findIndex(p => p.match_player_id === player.id);
+        const playerIndex = updatedArray.findIndex((p) => p.match_player_id === player.id);
 
         if (playerIndex >= 0) {
           updatedArray[playerIndex].playing_status = newStatus;
@@ -52,16 +51,24 @@ const PlayersComponent = ({ playersListData, onPlayersStatusChange ,setUpdatedPl
           <tr>
             <th>Sr. No.</th>
             <th>Name</th>
-            <th>Country</th>
+            <th>Team</th>
             <th>Playing Status</th>
           </tr>
         </thead>
         <tbody>
           {players.map((player, index) => (
-            <tr key={player.id}> {/* Use player.id as the key */}
+            <tr
+              key={player.id} // Use player.id as the key
+              onClick={(e) => {
+                if (e.target.tagName !== "INPUT") {
+                  handleToggleStatus(index); // Ensure only row clicks trigger toggle
+                }
+              }}
+              className={styles.row}
+            >
               <td>{index + 1}</td> {/* Sr. No. */}
-              <td>{player.player_details.name}</td>
-              <td>{player.player_details.country}</td>
+              <td>{player.player_name}</td>
+              <td>{player.team}</td>
               <td>
                 <input
                   type="checkbox"
