@@ -153,6 +153,61 @@ font-size: 1rem;
   margin-left: 10px;
 }
 
+/* Users.module.css */
+
+/* Container for filter dropdown */
+/* Users.module.css */
+
+/* Container for filter dropdown */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Space between search bar and dropdown */
+  margin-top: 1rem;
+}
+
+/* Label for the dropdown */
+.filterLabel {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Dropdown select */
+.filterSelect {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Dropdown hover and focus */
+.filterSelect:hover {
+  border-color: #888;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+/* Search bar and dropdown alignment */
+/* .searchBar {
+  flex: 1;
+} */
+
+.filters .searchBar {
+  flex-grow: 1;
+}
+
+.filterDropdown {
+  flex-shrink: 0;
+}
+
 
 
 

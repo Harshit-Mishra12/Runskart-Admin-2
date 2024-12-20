@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Import useNavigate
+import { useDispatch, useSelector } from "react-redux";
 import CustomButton from "../components/common/CustomButton";
 import styles from "./FAQ.module.css";
-import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
   fetchmatchplayerslist,
   updateplayingstatus,
@@ -12,6 +12,7 @@ import PlayersComponent from "../components/eventDetails/PlayersComponent";
 import Snackbar from "../components/common/Snackbar";
 
 const MatchPlayers = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const { playersList } = useSelector((store) => store.events); // Get playersList from Redux store
   const dispatch = useDispatch();
   const { id } = useParams(); // Get the event ID from route params
@@ -90,13 +91,6 @@ const MatchPlayers = () => {
           onClose={() => setSnackbarMessage(null)}
         />
       )}
-      {/* <div className={styles.header}>
-        <h1>Match Players</h1>
-        <CustomButton type="primary" onClick={handleSubmit}>
-          Submit
-        </CustomButton>
-      </div> */}
-
 
       <div className={styles.tableWrapper}>
         {loading ? (
@@ -110,6 +104,7 @@ const MatchPlayers = () => {
           />
         )}
       </div>
+
       <div className={styles.statsBar}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{playersListData.length}</span>
@@ -119,7 +114,11 @@ const MatchPlayers = () => {
         <CustomButton type="primary" onClick={handleSubmit}>
           Submit
         </CustomButton>
+
       </div>
+      <CustomButton type="secondary" onClick={() => navigate(-1)}>
+          Back
+        </CustomButton>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import * as types from "./actionTypes";
 const initialState = {
   usersList: [],
   totalVerifiedUser: "",
+  blockedCount:"",
   totalUnVerifiedUser: "",
   totalUsers: "",
   userDetail: "",
@@ -19,6 +20,7 @@ const reducer = (state = initialState, action) => {
         totalVerifiedUser: action.payload.verifiedCount,
         totalUnVerifiedUser: action.payload.unverifiedCount,
         totalUsers: action.payload.totalUsers,
+        blockedCount:action.payload.blockedCount
       };
     case types.GET_USERDETAIL_SUCCESS:
       return {

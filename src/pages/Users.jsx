@@ -12,11 +12,12 @@ const Users = () => {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
   const userPerPage = 5; // Adjust as needed
-  const { usersList, totalVerifiedUser, totalUnVerifiedUser, totalUsers } =
+  const { usersList, totalVerifiedUser, totalUnVerifiedUser, totalUsers,blockedCount } =
     useSelector((store) => store.users);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const totalPages = Math.ceil(totalUsers / userPerPage);
+  const [filterType, setFilterType] = useState("ALL");
   // Debounce the fetchUsers function, but only when searchTerm changes
   const debouncedFetchUsers = useCallback(
     _.debounce((term) => {
@@ -29,12 +30,14 @@ const Users = () => {
           per_page: userPerPage,
           page: currentPage,
           search_name: term,
+          type: filterType,
         };
       } else if (term != "") {
         params = {
           per_page: userPerPage,
           page: 1,
           search_name: term,
+          type: filterType,
         };
       }
 
@@ -42,18 +45,25 @@ const Users = () => {
     }, 1000), // 2 seconds debounce
     [currentPage] // Dependencies include currentPage so it uses the latest value
   );
+  const handleFilterChange = (event) => {
+    setFilterType(event.target.value);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
 
   // Fetch users when pagination changes
+
+
   useEffect(() => {
     const callbackAfter = () => setLoading(false);
     const params = {
       per_page: userPerPage,
       page: currentPage,
       search_name: searchTerm,
+      type: filterType, // Include filter type in params
     };
     setLoading(true);
     dispatch(fetchusers(params, callbackAfter));
-  }, [currentPage, dispatch]);
+  }, [currentPage, filterType, dispatch]);
 
   // Call the debounced function only when searchTerm changes
   useEffect(() => {
@@ -100,9 +110,14 @@ const Users = () => {
           <span className={styles.statValue}>{totalVerifiedUser}</span>
           <span className={styles.statLabel}>Verified Users</span>
         </div>
+
         <div className={styles.stat}>
           <span className={styles.statValue}>{totalUnVerifiedUser}</span>
-          <span className={styles.statLabel}>Unverified Users</span>
+          <span className={styles.statLabel}>Unverfied Users</span>
+        </div>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>{blockedCount}</span>
+          <span className={styles.statLabel}>Blocked Users</span>
         </div>
         <div className={styles.searchBar}>
           <input
@@ -113,7 +128,25 @@ const Users = () => {
             className={styles.searchInput}
           />
         </div>
+        <div className={styles.filterDropdown}>
+            <label htmlFor="filterBy" className={styles.filterLabel}>
+              Filter By:
+            </label>
+            <select
+              id="filterBy"
+              value={filterType}
+              onChange={handleFilterChange}
+              className={styles.filterSelect}
+            >
+              <option value="ALL">All</option>
+              <option value="VERIFIED">Verified</option>
+              <option value="UNVERIFIED">Unverified</option>
+              <option value="BLOCKED">Blocked</option>
+            </select>
+          </div>
+
       </div>
+
       <div className={styles.tableWrapper}>
         {loading ? (
           <TableSkeleton />
@@ -127,7 +160,8 @@ const Users = () => {
                 <th>Phone Number</th>
                 <th>Date of Birth</th>
                 <th>Display Picture</th>
-                <th>Verification Status</th>
+                <th>Action Status</th>
+                <th>Verfication Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -157,13 +191,21 @@ const Users = () => {
                         fontWeight: "bold",
                       }}
                     >
-                      {user.status === "ACTIVE"
-                        ? "Verified"
-                        : user.status === "INACTIVE"
-                        ? "Blocked"
-                        : user.status === "VERIFICATIONPENDING"
-                        ? "Unverified"
-                        : "Unknown Status"}
+                      {user.status}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        backgroundColor:
+                          user.user_status === "VERIFIED" ? "#d4edda" : "#f8d7da",
+                        padding: "0.5rem 1rem",
+                        borderRadius: "0.5rem",
+                        color: user.user_status === "VERIFIED" ? "#155724" : "#721c24",
+                        fontWeight: "bold",
+                      }}
+                    >
+                       {user.user_status}
                     </span>
                   </td>
                   <td>
