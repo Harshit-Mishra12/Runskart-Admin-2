@@ -16,6 +16,8 @@ const navigation = [
   { name: "Users", href: "/users", icon: UsersIcon },
   { name: "Transactions", href: "/transactions", icon: CurrencyDollarIcon },
   { name: "FAQ", href: "/faq", icon: QuestionMarkCircleIcon },
+  { name: "Terms & Conditions", href: "/termsAndCondition", icon: UsersIcon },
+
 ];
 
 const Sidebar = ({ open, setOpen }) => {

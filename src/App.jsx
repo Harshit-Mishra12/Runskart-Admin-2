@@ -9,12 +9,14 @@ import {
   FAQ,
   EventDetails,
   UserDetails,
+
 } from "./pages/index";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./Route/ProtectedRoute";
 import MatchPlayers from "./pages/MatchPlayers";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import TermsAndCondition from "./pages/TermsAndCondition";
 const queryClient = new QueryClient();
 function App() {
   return (
@@ -48,6 +50,7 @@ function App() {
               element={<ProtectedRoute element={<Transactions />} />}
             />
             <Route path="faq" element={<ProtectedRoute element={<FAQ />} />} />
+            <Route path="termsAndCondition" element={<ProtectedRoute element={<TermsAndCondition />} />} />
           </Route>
           <Route path="login" element={<Login />} />
         </Routes>
