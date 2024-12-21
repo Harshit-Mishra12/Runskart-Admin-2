@@ -8,6 +8,7 @@ import {
   CurrencyDollarIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/solid";
+import { DocumentIcon } from "@heroicons/react/24/outline";
 import styles from "./Sidebar.module.css";
 
 const navigation = [
@@ -16,7 +17,7 @@ const navigation = [
   { name: "Users", href: "/users", icon: UsersIcon },
   { name: "Transactions", href: "/transactions", icon: CurrencyDollarIcon },
   { name: "FAQ", href: "/faq", icon: QuestionMarkCircleIcon },
-  { name: "Terms & Conditions", href: "/termsAndCondition", icon: UsersIcon },
+  { name: "Terms & Conditions", href: "/termsAndCondition", icon: DocumentIcon },
 
 ];
 
